@@ -1,167 +1,202 @@
-import {
-  Avatar,
-  Paper,
-  Container,
-  Button,
-  Grid,
-  Typography,
-} from "@mui/material";
-import { styled } from "@mui/system";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import Icon from "./Icon";
 import { useState } from "react";
-import useStyle from './style'
-import Input from "./input";
-import { useDispatch,useSelector } from "react-redux";
-import { register,login } from "../../api/AuthRequest/AuthRequest";
+import {
+  Typography,
+  Avatar,
+  Button,
+  Paper,
+  Grid,
+  Container,
+} from "@mui/material";
+import { useFormik } from "formik";
+import * as yup from "yup";
+import useStyles from "./styles";
+import Input from "./Input";
 import { useNavigate } from "react-router-dom";
-import { setLogin } from "../../state/slice";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-const AuthContainer = styled(Container)(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  height: "100vh",
-}));
+import { useDispatch } from "react-redux";
+import { setLogin } from "../../state/slice";
+import { register, login } from "../../api/AuthRequest/AuthRequest";
 
 const Auth = () => {
+  let classes = useStyles();
+  const [showPassword, setShowPassword] = useState(false);
+  const [isSignup, setIsSignup] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const classes = useStyle();
-  const [IssignUp, setIsSignUp] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [confirmPassword, setConfirmPassword] = useState(true);
-const user = useSelector((state)=>state.user)
-  const [data, setData] = useState({
-    name: "",
-    lastname: "",
-    userName: "",
-    number: "",
-    email: "",
-    password: "",
-    confirmpass: "",
-  });
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (IssignUp) {
-      if (data.confirmpass === data.password) {
-        const userData = await register(data)
-        dispatch(setLogin(userData))
-        navigate("../home", { replace: true })
-      } else {
-        setConfirmPassword(false);
+  const handleShowPassword = () => {
+    setShowPassword((prevShowPassword) => !prevShowPassword);
+  };
+  const handleSubmit = async (values, onSubmitProps) => {
+    if (isSignup) {
+      const userData = await register(values, onSubmitProps,handleToast);
+      if(userData.status==="success"){
+        
+        dispatch(setLogin(userData));
+        navigate("../home", { replace: true });
+      }
+      else{
+        handleToast("Something went wrong","error")
       }
     } else {
-        const userData = await login(data)
-        dispatch(setLogin(userData))
-        console.log(user);
-
-        navigate("../home", { replace: true })
+      const userData = await login(values, onSubmitProps,handleToast);
+      dispatch(setLogin(userData));
+      navigate("../home", { replace: true });
+    }
+  };
+  const handleToast = (message, type) => {
+    if (type === 'success') {
+      toast.success(message);
+    } else if (type === 'error') {
+      toast.error(message);
+    }
+  };
+ 
+  const getValidationSchema = () => {
+    if (isSignup) {
+      return yup.object().shape({
+        name: yup
+          .string()
+          .required("Name is required")
+          .matches(
+            /^[^\s].{2,}$/,
+            "Name must not start with a space and have at least 3 characters"
+          ),
+        userName: yup
+          .string()
+          .required("UserName is required")
+          .matches(
+            /^[^\s].{2,}$/,
+            "UserName must not start with a space and have at least 3 characters"
+          ),
+        number: yup
+          .string()
+          .required("Number is required")
+          .matches(
+            /^[^\s].{2,}$/,
+            "Number must not start with a space and have at least 3 characters"
+          ),
+        email: yup
+          .string()
+          .email("Invalid email")
+          .required("Email is required"),
+        password: yup.string().required("Password is required"),
+        confirmPassword: yup
+          .string()
+          .oneOf([yup.ref("password")], "Passwords must match"),
+      });
+    } else {
+      return yup.object().shape({
+        userName: yup.string().required("UserName is required"),
+        password: yup.string().required("Password is required"),
+      });
     }
   };
 
-  const handleChange = (e) => {
-    setData({ ...data, [e.target.name]: e.target.value });
-  };
-
-  const resetForm = () => {
-    setData({
+  const formik = useFormik({
+    initialValues: {
       name: "",
       userName: "",
-      email: "",
       number: "",
+      email: "",
       password: "",
-      confirmpass: "",
-    });
-  };
-
-  const handleShowPassword = () => {
-    setShowPassword((prev) => !prev);
-  };
+      confirmPassword: "",
+    },
+    validationSchema: getValidationSchema(),
+    onSubmit: handleSubmit,
+  });
 
   const switchMode = () => {
-    setIsSignUp((prev) => !prev);
-    resetForm();
+    setIsSignup((prevIsSignup) => !prevIsSignup);
+    formik.resetForm();
   };
 
   return (
-    <AuthContainer maxWidth="xs" component="main" className={classes.container}>
-      <Paper elevation={8} className={classes.paper}>
-        <Avatar className={classes.avatar}>
-          <LockOutlinedIcon />
-        </Avatar>
-        <Typography variant="h5">{IssignUp ? "Sign Up" : "Sign In"}</Typography>
-        <form className={classes.form} onSubmit={handleSubmit}>
+    <Container component="main" maxWidth="xs"   style={{
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      height: "100vh",
+    }}>
+      {/* <ToastContainer position="bottom-left" /> */}
+      <Paper className={classes.paper} elevation={6}>
+        <Avatar className={classes.avatar}></Avatar>
+        <Typography component="h1" variant="h5">
+          {isSignup ? "Sign up" : "Sign in"}
+        </Typography>
+        <form className={classes.form} onSubmit={formik.handleSubmit}>
           <Grid container spacing={2}>
-            {IssignUp && (
+            {isSignup && (
               <>
                 <Input
-                  name="userName"
-                  label="User Name"
-                  handleChange={handleChange}
+                  name="name"
+                  label="Name"
+                  handleChange={formik.handleChange}
+                  value={formik.values.name}
+                  error={formik.errors.name}
                   autoFocus
                   half
-                  pattern="^(?! )[A-Za-z ]+$"
                 />
                 <Input
-                  name="name"
-                  label="Full Name"
-                  handleChange={handleChange}
+                  name="userName"
+                  label="UserName"
+                  handleChange={formik.handleChange}
+                  value={formik.values.userName}
+                  error={formik.errors.userName}
                   half
-                  pattern="^(?! )[A-Za-z ]+$"
                 />
-                <Input
-                  name="email"
-                  label="Email"
-                  handleChange={handleChange}
-                  type="email"
-                  pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
-                />
+              </>
+            )}
+            {!isSignup && (
+              <Input
+                name="userName"
+                label="UserName"
+                handleChange={formik.handleChange}
+                value={formik.values.userName}
+                error={formik.errors.userName}
+              />
+            )}
+
+            {isSignup && (
+              <>
                 <Input
                   name="number"
                   label="Number"
-                  handleChange={handleChange}
+                  handleChange={formik.handleChange}
+                  value={formik.values.number}
+                  error={formik.errors.number}
                   type="number"
+                />
+                <Input
+                  name="email"
+                  label="Email Address"
+                  handleChange={formik.handleChange}
+                  value={formik.values.email}
+                  error={formik.errors.email}
+                  type="email"
                 />
               </>
             )}
-            {!IssignUp && (
-              <Input
-                name="userName"
-                label="User Name"
-                handleChange={handleChange}
-                pattern="^(?! )[A-Za-z ]+$"
-              />
-            )}
+
             <Input
               name="password"
               label="Password"
-              handleChange={handleChange}
+              handleChange={formik.handleChange}
+              value={formik.values.password}
+              error={formik.errors.password}
               type={showPassword ? "text" : "password"}
               handleShowPassword={handleShowPassword}
-              pattern="^(?! )[^\s]{3,}$"
             />
-            {IssignUp && (
-              <>
-                <Input
-                  name="confirmpass"
-                  label="Confirm Password"
-                  handleChange={handleChange}
-                  type="password"
-                  
-                />
-                <span
-                  style={{
-                    display: confirmPassword ? "none" : "block",
-                    color: "red",
-                    fontSize: "12px",
-                    alignSelf: "flex-end",
-                  }}
-                >
-                  * Passwords do not match
-                </span>
-              </>
+            {isSignup && (
+              <Input
+                name="confirmPassword"
+                label="Repeat Password"
+                handleChange={formik.handleChange}
+                value={formik.values.confirmPassword}
+                error={formik.errors.confirmPassword}
+                type="password"
+              />
             )}
           </Grid>
           <Button
@@ -170,32 +205,22 @@ const user = useSelector((state)=>state.user)
             variant="contained"
             color="primary"
             className={classes.submit}
-            style={{ marginTop: '16px', marginBottom: '8px', marginLeft: '0' }}
           >
-            {IssignUp ? "Sign Up" : "Sign In"}
+            {isSignup ? "Sign Up" : "Sign In"}
           </Button>
-          <Button
-            className={classes.googleButton}
-            style={{ marginBottom: '8px' }}
-            color="primary"
-            fullWidth
-            startIcon={<Icon />}
-            variant="contained"
-          >
-            Google Sign In
-          </Button>
-          <Grid container justifyContent="center">
+          <Grid container justifyContent="flex-end">
             <Grid item>
               <Button onClick={switchMode}>
-                {IssignUp
-                  ? "Already have an account? Sign In"
-                  : "Don't have an account? Sign Up"}
+                {isSignup
+                  ? "Already have an account? Login In"
+                  : "New user? Sign Up"}
               </Button>
             </Grid>
           </Grid>
         </form>
       </Paper>
-    </AuthContainer>
+      <ToastContainer position="bottom-center"/>
+    </Container>
   );
 };
 

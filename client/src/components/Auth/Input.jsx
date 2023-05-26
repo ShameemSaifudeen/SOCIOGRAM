@@ -1,46 +1,43 @@
-import { Grid, TextField, InputAdornment, IconButton } from '@mui/material';
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import { useState } from 'react';
+import React from "react";
+import { TextField, Grid, InputAdornment, IconButton } from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
-// eslint-disable-next-line react/prop-types
-const Input = ({ name, half, label, handleChange, autoFocus, type, handleShowPassword ,pattern}) => {
-  const [isValid, setIsValid] = useState(true);
-
-  const handleValidity = (e) => {
-    setIsValid(e.target.validity.valid);
-  };
-  const inputStyle = {
-    color: isValid ? "inherit" : "red",
-  };
+const Input = ({
+  name,
+  handleChange,
+  value,
+  error,
+  label,
+  half,
+  autoFocus,
+  type,
+  handleShowPassword,
+}) => {
   return (
     <Grid item xs={12} sm={half ? 6 : 12}>
       <TextField
         name={name}
         onChange={handleChange}
-        onInput={handleValidity}
+        value={value}
         variant="outlined"
-        required
         fullWidth
         label={label}
         autoFocus={autoFocus}
         type={type}
-        inputProps={{
-          pattern: pattern,
-          style: inputStyle
-        }}
+        error={Boolean(error)}
+        helperText={error}
         InputProps={
-          name === 'password'
+          name === "password"
             ? {
                 endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton onClick={handleShowPassword} edge="end">
-                      {type === 'password' ? <Visibility /> : <VisibilityOff />}
+                    <IconButton onClick={handleShowPassword}>
+                      {type === "password" ? <Visibility /> : <VisibilityOff />}
                     </IconButton>
                   </InputAdornment>
                 ),
               }
-            : null
+            : undefined
         }
       />
     </Grid>

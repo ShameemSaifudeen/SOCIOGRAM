@@ -1,0 +1,8 @@
+{
+    "workbench.colorTheme": "Default High Contrast",
+    "prettier.jsxSingleQuote": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "[javascriptreact]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    }
+}

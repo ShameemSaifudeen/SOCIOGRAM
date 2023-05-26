@@ -7,10 +7,11 @@ import { createTheme } from "@mui/material/styles";
 import { themeSettings } from "./theme";
 import Home from "./pages/Home/Home";
 import Auth from "./components/Auth/Auth";
+import ProfilePage from "./pages/Profile/Profile";
 function App() {
   const mode = useSelector((state) => state.mode);
   const theme = useMemo(() => createTheme(themeSettings(mode)), [mode]);
-  const user = useSelector((state) => state.user);
+  const token = useSelector((state) => state.token);
 
   return (
     <div className="app">
@@ -20,16 +21,20 @@ function App() {
           <Routes>
           <Route
             path="/"
-            element={user ? <Navigate to="home" /> : <Navigate to="auth" />}
+            element={token ? <Navigate to="home" /> : <Navigate to="auth" />}
           />
           <Route
             path="/home"
-            element={user ? <Home /> : <Navigate to="../auth" />}
+            element={token ? <Home /> : <Navigate to="../auth" />}
           />
           <Route
             path="/auth"
-            element={user ? <Navigate to="../home" /> : <Auth />}
+            element={token ? <Navigate to="../home" /> : <Auth />}
           />
+           <Route
+              path="/profile/:userId"
+              element={token? <ProfilePage /> : <Navigate to="/" />}
+            />
           </Routes>
         </ThemeProvider>
       </BrowserRouter>

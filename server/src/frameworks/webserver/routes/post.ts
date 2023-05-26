@@ -10,6 +10,10 @@ const postRouter = () => {
 
   router.post("/",upload.single("picture"), controller.createPost);
   router.get("/",controller.getPosts)
+  router.get('/:userId',controller.getUserPost)
+  router.delete('/:id',controller.deletePost)
+  router.put('/:id/like',controller.likePost)
+  router.put('/:id/unlike',controller.UnLikePost)
 
   return router;
 };

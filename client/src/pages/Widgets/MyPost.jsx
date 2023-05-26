@@ -40,7 +40,6 @@ const MyPostWidget = ({ picturePath }) => {
   const mediumMain = palette.neutral.mediumMain;
   const medium = palette.neutral.medium;
   const navigate = useNavigate()
-console.log(token);
   const handlePost = async () => {
     const formData = new FormData();
     formData.append("userId", _id);

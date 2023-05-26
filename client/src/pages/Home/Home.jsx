@@ -13,11 +13,11 @@ const HomePage = () => {
   
 
   return (
-    <Box>
+    <Box >
       <Navbar />
-      <Box
+      <Box 
         width="100%"
-        padding="2rem 6%"
+        padding="7rem 6%"
         display={isNonMobileScreens ? "flex" : "block"}
         gap="0.5rem"
         justifyContent="space-between"
@@ -36,6 +36,9 @@ const HomePage = () => {
           <Box flexBasis="26%">
             {/* can place another widget here */}
             <FriendListWidget />
+            <Box m="2rem 0" />
+            <FriendListWidget userId={_id} isFollowingList ={true} />
+
             <Box m="2rem 0" />
           </Box>
         )}

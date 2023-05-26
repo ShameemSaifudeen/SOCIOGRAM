@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import {
     ManageAccountsOutlined,
     EditOutlined,
@@ -14,7 +15,7 @@ import {
 
   
   // eslint-disable-next-line react/prop-types
-  const UserWidget = ({ userId }) => {
+  const UserWidget = ({ userId , userData}) => {
     const { palette } = useTheme();
     const navigate = useNavigate();
     const user = useSelector((state) => state.user);
@@ -44,9 +45,9 @@ import {
                   },
                 }}
               >
-                {user.name}
+                {userData?userData.name:user.name}
               </Typography>
-              <Typography color={medium}>10 friends</Typography>
+              <Typography color={medium}>{userData?userData.userName:user.userName}</Typography>
             </Box>
           </FlexBetween>
           <ManageAccountsOutlined />
@@ -71,15 +72,15 @@ import {
         {/* THIRD ROW */}
         <Box p="1rem 0">
           <FlexBetween mb="0.5rem">
-            <Typography color={medium}>Whos viewed your profile</Typography>
+            <Typography color={main} fontWeight="500">Followers</Typography>
             <Typography color={main} fontWeight="500">
-              400
+            {userData?userData.followers.length:user.followers.length}
             </Typography>
           </FlexBetween>
           <FlexBetween>
-            <Typography color={medium}>Impressions of your post</Typography>
+            <Typography color={main} fontWeight="500">Following</Typography>
             <Typography color={main} fontWeight="500">
-              39
+            {userData?userData.following.length:user.following.length}
             </Typography>
           </FlexBetween>
         </Box>

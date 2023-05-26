@@ -17,9 +17,13 @@ export const userRegister = async (
 ) => {  
   user.email = user.email.toLowerCase();
   const isExistingEmail = await userRepository.getUserByEmail(user.email);
+  const isExistingUserName = await userRepository.getUserByUserName(user.userName)
+  if(isExistingUserName){
+    throw new AppError("This Username is already taken",HttpStatus.UNAUTHORIZED)
+  }
   if (isExistingEmail) {
     console.log("existing email: ")
-    throw new AppError("existing email", HttpStatus.UNAUTHORIZED);
+    throw new AppError("An account is already registered with this mail", HttpStatus.UNAUTHORIZED);
   }
   if(user.password.length<=3){
     console.log("password length is 0: ")
@@ -41,7 +45,7 @@ export const userLogin = async (
 ) => {
   const user:any= await userRepository.getUserByUserName(userName)
   if(!user){
-    throw new AppError("this user does not exist",HttpStatus.UNAUTHORIZED)
+    throw new AppError("This user does not exist",HttpStatus.UNAUTHORIZED)
   }
   const isPasswordCorrect = await authService.comparePassword(password,user.password)
   if(!isPasswordCorrect){

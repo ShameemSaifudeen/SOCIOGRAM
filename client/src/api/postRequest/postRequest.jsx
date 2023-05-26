@@ -30,7 +30,21 @@ export const createPost = async (token, formData) => {
 
   export const getUserPosts = async (userId, token) => {
     try {
-      const response = await API.get(`/posts/${userId}/posts`, {
+      const response = await API.get(`/post/${userId}/posts`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = response.data;
+      return data;
+    } catch (error) {
+      // Handle error
+      console.error("Error getting user posts:", error);
+      throw error;
+    }
+  };
+
+  export const getLike = async (token,postId,loggedUserId) => {
+    try {
+      const response = await API.put(`api/post/${postId}/like`, {loggedId:loggedUserId}, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = response.data;
