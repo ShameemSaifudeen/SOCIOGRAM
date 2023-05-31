@@ -10,6 +10,7 @@ import {
   useTheme,
   useMediaQuery,
   Tooltip,
+  CircularProgress,
 } from "@mui/material";
 import {
   Search,
@@ -25,13 +26,17 @@ import { useDispatch, useSelector } from "react-redux";
 import { setMode, setLogout } from "../../state/slice";
 import { useNavigate } from "react-router-dom";
 import FlexBetween from "../../components/FlexBetween/FlexBetween";
-import zIndex from "@mui/material/styles/zIndex";
+import debounce from "lodash.debounce";
+import { userSearch } from "../../api/userApi/userApi";
 
 const Navbar = () => {
   const [isMobileMenuToggled, setIsMobileMenuToggled] = useState(false);
+  const [suggestions, setSuggestions] = useState([]);
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
+  const token = useSelector((state) => state.token);
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
 
   const theme = useTheme();
@@ -40,11 +45,32 @@ const Navbar = () => {
   const background = theme.palette.background.default;
   const primaryLight = theme.palette.primary.light;
   const alt = theme.palette.background.alt;
-
+  const handleUser = (userId) => {
+    setLoading(true);
+    setSuggestions([]);
+    navigate(`/profile/${userId}`);
+    setLoading(false);
+  };
   const fullName = `${user?.userName}`;
 
+  const handleQueryChange = debounce(async (newQuery) => {
+    try {
+      const response = await userSearch(newQuery, token);
+      setSuggestions(response);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching suggestions:", error);
+      setLoading(false);
+    }
+  }, 500); // Adjust the debounce delay (in milliseconds) as needed
+
+  const searchUser = (event) => {
+    const inputValue = event.target.value;
+    handleQueryChange(inputValue);
+  };
+
   return (
-    <Box sx={{position:"fixed",minWidth:"100%", zIndex:"2"}}>
+    <Box sx={{ position: "fixed", minWidth: "100%", zIndex: "2" }}>
       <FlexBetween padding='1rem 6%' backgroundColor={alt}>
         <FlexBetween gap='1.75rem'>
           <Typography
@@ -62,19 +88,56 @@ const Navbar = () => {
             SocioGram
           </Typography>
           {isNonMobileScreens && (
-            <FlexBetween
-              backgroundColor={neutralLight}
-              borderRadius='9px'
-              gap='3rem'
-              padding='0.1rem 1.5rem'
-            >
-              <InputBase placeholder='Search...' />
-              <IconButton>
-                <Tooltip title='Search user' placement='bottom'>
-                  <Search />
-                </Tooltip>
-              </IconButton>
-            </FlexBetween>
+            <Box sx={{ position: "relative", width: "300px" }}>
+              <FlexBetween
+                backgroundColor={neutralLight}
+                borderRadius='9px'
+                gap='3rem'
+                padding='0.1rem 1.5rem'
+              >
+                <InputBase placeholder='Search...' onKeyUp={searchUser} />
+                <IconButton>
+                  <Tooltip title='Search user' placement='bottom'>
+                    <Search />
+                  </Tooltip>
+                </IconButton>
+              </FlexBetween>
+              {loading && <CircularProgress />}
+              {Boolean(suggestions.length) && (
+                <Box
+                  sx={{
+                    position: "absolute",
+                    top: "100%",
+                    left: 0,
+                    width: "100%",
+                    backgroundColor: background,
+                    borderRadius: "0.5rem",
+                    boxShadow: theme.shadows[1],
+                    mt: "0.25rem",
+                    zIndex: 1,
+                    overflowY: "auto",
+                  }}
+                >
+                  {suggestions.map((suggestion) => (
+                    <Typography
+                      key={suggestion._id}
+                      onClick={() => handleUser(suggestion._id)}
+                      sx={{
+                        py: "0.5rem",
+                        px: "1rem",
+                        cursor: "pointer",
+                        "&:hover": {
+                          backgroundColor: theme.palette.primary.light,
+                          color: theme.palette.background.default,
+                        },
+                      }}
+                    >
+                      {suggestion.name}
+                    </Typography>
+                  ))}
+                </Box>
+              )}
+            </Box>
           )}
         </FlexBetween>
 
@@ -167,23 +230,39 @@ const Navbar = () => {
             >
               <IconButton
                 onClick={() => dispatch(setMode())}
-                sx={{ fontSize: "25px" }}
+                sx={{ fontSize: "30px" }}
               >
                 {theme.palette.mode === "dark" ? (
-                  <DarkMode sx={{ fontSize: "25px" }} />
+                  <Tooltip title='Light mode' placement='bottom'>
+                    <DarkMode />
+                  </Tooltip>
                 ) : (
-                  <LightMode sx={{ color: dark, fontSize: "25px" }} />
+                  <Tooltip title='Dark mode' placement='bottom'>
+                    <LightMode sx={{ color: dark }} />
+                  </Tooltip>
                 )}
               </IconButton>
-              <Message sx={{ fontSize: "25px" }} />
-              <Notifications sx={{ fontSize: "25px" }} />
-              <Help sx={{ fontSize: "25px" }} />
+              <IconButton sx={{ fontSize: "30px" }}>
+                <Tooltip title='Chat' placement='bottom'>
+                  <Message />
+                </Tooltip>
+              </IconButton>
+              <IconButton sx={{ fontSize: "30px" }}>
+                <Tooltip title='Notification' placement='bottom'>
+                  <Notifications />
+                </Tooltip>
+              </IconButton>
+              <IconButton sx={{ fontSize: "30px" }}>
+                <Tooltip title='Help' placement='bottom'>
+                  <Help />
+                </Tooltip>
+              </IconButton>
               <FormControl variant='standard' value={fullName}>
                 <Select
                   value={fullName}
                   sx={{
                     backgroundColor: neutralLight,
-                    width: "150px",
+                    width: "200px",
                     borderRadius: "0.25rem",
                     p: "0.25rem 1rem",
                     "& .MuiSvgIcon-root": {

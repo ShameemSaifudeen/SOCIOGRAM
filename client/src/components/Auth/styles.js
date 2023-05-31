@@ -30,12 +30,12 @@ const useStyles = makeStyles((theme) => {
       width: '100%',
       marginTop: themeInstance.spacing(3),
     },
-    submit: {
-      margin: themeInstance.spacing(3, 0, 2),
-    },
-    googleButton: {
-      marginBottom: themeInstance.spacing(2),
-    },
+    // submit: {
+    //   margin: themeInstance.spacing(3, 0, 2),
+    // },
+    // googleButton: {
+    //   marginBottom: themeInstance.spacing(2),
+    // },
   };
 });
 

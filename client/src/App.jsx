@@ -8,6 +8,7 @@ import { themeSettings } from "./theme";
 import Home from "./pages/Home/Home";
 import Auth from "./components/Auth/Auth";
 import ProfilePage from "./pages/Profile/Profile";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 function App() {
   const mode = useSelector((state) => state.mode);
   const theme = useMemo(() => createTheme(themeSettings(mode)), [mode]);
@@ -15,6 +16,7 @@ function App() {
 
   return (
     <div className="app">
+      <GoogleOAuthProvider clientId="19614587769-2bsfr3g33qnlbof8p92uq7tll28pv898.apps.googleusercontent.com">
       <BrowserRouter>
         <ThemeProvider theme={theme}>
           <CssBaseline />
@@ -38,6 +40,7 @@ function App() {
           </Routes>
         </ThemeProvider>
       </BrowserRouter>
+      </GoogleOAuthProvider>
     </div>
   );
 }

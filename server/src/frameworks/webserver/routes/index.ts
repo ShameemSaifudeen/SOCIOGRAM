@@ -10,8 +10,8 @@ import userAuthMiddleware from '../middlewares/authMiddleWare';
 
 const routes = (app:Application)=>{
   app.use('/api/auth', authRouter());
-  app.use('/api/user',userRouter());
-  app.use('/api/post',postRouter());
+  app.use('/api/user',userAuthMiddleware,userRouter());
+  app.use('/api/post',userAuthMiddleware,postRouter());
 }
 
 export default routes

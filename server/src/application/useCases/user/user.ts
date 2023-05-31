@@ -7,12 +7,31 @@ export const userById = async (
   repository: ReturnType<UserDbInterface>
 ) => {
   const user = await repository.getUserById(id);
-  console.log(user);
 
   if (!user) {
     throw new AppError("user not found", HttpStatus.UNAUTHORIZED);
   }
   return user;
+};
+export const profileUpdate = async (
+  id: string,
+  user: {
+    name: string;
+    userName: string;
+    email: string;
+    number: string;
+    bio: string;
+    location: string;
+    displayPicture: string | null;
+  },
+  repository: ReturnType<UserDbInterface>
+) => {
+  const updateProfile = await repository.updateProfile(id, user);
+
+  if (!updateProfile) {
+    throw new AppError("user not found", HttpStatus.UNAUTHORIZED);
+  }
+  return updateProfile;
 };
 
 export const followUser = async (
@@ -20,44 +39,52 @@ export const followUser = async (
   friendId: string,
   repository: ReturnType<UserDbInterface>
 ) => {
-  const result = await repository.followUser(id, friendId)
-  if(!result){
-    throw new AppError("user is already followed",HttpStatus.FORBIDDEN)
+  const result = await repository.followUser(id, friendId);
+  if (!result) {
+    throw new AppError("user is already followed", HttpStatus.FORBIDDEN);
   }
-  return result
+  return result;
+};
+export const userSearch = async (
+  name: any,
+  repository: ReturnType<UserDbInterface>
+) => {
+  const result = await repository.userSearch(name);
+  if (!result) {
+    throw new AppError("user is already followed", HttpStatus.FORBIDDEN);
+  }
+  return result;
 };
 export const unFollowUser = async (
   id: string,
   friendId: string,
   repository: ReturnType<UserDbInterface>
 ) => {
-  const result = await repository.unFollowUser(id, friendId)
-  if(!result){
-    throw new AppError("user is already unfollowed",HttpStatus.FORBIDDEN)
+  const result = await repository.unFollowUser(id, friendId);
+  if (!result) {
+    throw new AppError("user is already unfollowed", HttpStatus.FORBIDDEN);
   }
-  return result
+  return result;
 };
 export const followersList = async (
   id: string,
   repository: ReturnType<UserDbInterface>
 ) => {
-  const followers = await repository.followersList(id)
+  const followers = await repository.followersList(id);
   // if(!followers){
   //   // throw new AppError("No Followers",HttpStatus.FORBIDDEN)
 
   // }
-  return followers
+  return followers;
 };
 export const followingList = async (
   id: string,
   repository: ReturnType<UserDbInterface>
 ) => {
-  const following = await repository.followingList(id)
+  const following = await repository.followingList(id);
   // if(!followers){
   //   // throw new AppError("No Followers",HttpStatus.FORBIDDEN)
 
   // }
-  return following
+  return following;
 };
-
-

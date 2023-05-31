@@ -7,6 +7,7 @@ import { UserRepositoryMongoDB } from "../../frameworks/database/Mongodb/reposit
 import {
   userRegister,
   userLogin,
+  googleLogin,
 } from "../../application/useCases/auth/userAuth";
 
 const authController = (
@@ -19,7 +20,6 @@ const authController = (
   const authService = authServiceInterface(authServiceImpl());
 
   const registerUser = asyncHandler(async (req: Request, res: Response) => {
-    console.log(req.body);
     const { name, userName, email, number, password } = req.body;
     const user = {
       name,
@@ -28,14 +28,11 @@ const authController = (
       number,
       password,
     };
-
     const token = await userRegister(user, dbRepositoryUser, authService);
-    console.log(token,"MMMMM");
-    
     res.json({
       status: "success",
       message: "new user registered",
-      token: token
+      token: token,
     });
   });
 
@@ -54,10 +51,28 @@ const authController = (
       token,
     });
   });
+  const googleLoginUser = asyncHandler(async (req: Request, res: Response) => {
+    const userName: string = req.body?.givenName;
+    const name: string = req.body?.name;
+    const email: string = req.body?.email;
+    const token = await googleLogin(
+      userName,
+      name,
+      email,
+      dbRepositoryUser,
+      authService
+    );
+    res.json({
+      status: "success",
+      message: "new user registered",
+      token: token,
+    });
+  });
 
   return {
     registerUser,
     loginUser,
+    googleLoginUser,
   };
 };
 

@@ -3,7 +3,6 @@ import { HttpStatus } from "../../../types/httpStatus";
 import AppError from "../../../utils/appError";
 import { postDbInterfaceType } from "../../repositories/postDbRepositoryInterface";
 
-
 export const postCreate = async (
   post: {
     userId: string;
@@ -14,8 +13,6 @@ export const postCreate = async (
   repository: ReturnType<postDbInterfaceType>
 ) => {
   const newPost = await repository.createPost(post);
-  console.log(post);
-
   if (!newPost) {
     throw new AppError("post not created", HttpStatus.BAD_REQUEST);
   }
@@ -30,7 +27,8 @@ export const getAllPosts = async (
   }
   return getPosts;
 };
-export const getUserPosts = async ( id: string,
+export const getUserPosts = async (
+  id: string,
   repository: ReturnType<postDbInterfaceType>
 ) => {
   const getPosts = await repository.getUserPosts(id);
@@ -39,32 +37,37 @@ export const getUserPosts = async ( id: string,
   }
   return getPosts;
 };
-export const postDelete = async (id: string, repository: ReturnType<postDbInterfaceType>) => {
-  const deletePost = await repository.deletePost(id)
-  if(!deletePost) {
+export const postDelete = async (
+  id: string,
+  repository: ReturnType<postDbInterfaceType>
+) => {
+  const deletePost = await repository.deletePost(id);
+  if (!deletePost) {
     throw new AppError("Post Delete Failed", HttpStatus.BAD_REQUEST);
   }
   return deletePost;
-}
-export const postLike = async (id: string, loggedId: string, repository: ReturnType<postDbInterfaceType>) => {
-  const likedPost = await repository.likePost(id, loggedId)
-  console.log(likedPost);
-  
-  if(!likedPost) {
+};
+export const postLike = async (
+  id: string,
+  loggedId: string,
+  repository: ReturnType<postDbInterfaceType>
+) => {
+  const likedPost = await repository.likePost(id, loggedId);
 
-    
+  if (!likedPost) {
     throw new AppError("Post not Found", HttpStatus.BAD_REQUEST);
   }
-  return likedPost
-}
-export const postUnLike = async (id: string, loggedId: string, repository: ReturnType<postDbInterfaceType>) => {
-  const unLikedPost = await repository.unLikePost(id, loggedId)
-  console.log(unLikedPost);
-  
-  if(!unLikedPost) {
+  return likedPost;
+};
+export const postUnLike = async (
+  id: string,
+  loggedId: string,
+  repository: ReturnType<postDbInterfaceType>
+) => {
+  const unLikedPost = await repository.unLikePost(id, loggedId);
 
-    
+  if (!unLikedPost) {
     throw new AppError("Post not Found", HttpStatus.BAD_REQUEST);
   }
-  return unLikedPost
-}
+  return unLikedPost;
+};

@@ -3,8 +3,6 @@ import configKeys from "../../../../config";
 mongoose.set("strictQuery", true);
 
 const connectDB = async () => {
-  console.log("he");
-
   try {
     await mongoose.connect(configKeys.MONGO_DB_URL);
     console.log(`Database connected successfully`.bg_green);

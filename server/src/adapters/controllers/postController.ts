@@ -11,7 +11,6 @@ const postController = (
 ) => {
   const dbRepositoryPost = postDbInterface(postDbImp());
   const createPost = asyncHandler(async (req: Request, res: Response) => {
-    console.log(req.body,req.file);
     const image : any = req.file?.filename
     const { userId, description,userName } = req.body;   
     const post = { userId, description, image ,userName};

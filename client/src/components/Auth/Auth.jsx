@@ -12,12 +12,15 @@ import * as yup from "yup";
 import useStyles from "./styles";
 import Input from "./Input";
 import { useNavigate } from "react-router-dom";
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { useDispatch } from "react-redux";
 import { setLogin } from "../../state/slice";
 import { register, login } from "../../api/AuthRequest/AuthRequest";
+import { GoogleLogin } from "react-google-login";
+import { useEffect } from "react";
+import { gapi } from "gapi-script";
+import { googleLogin } from "../../api/AuthRequest/AuthRequest";
 
 const Auth = () => {
   let classes = useStyles();
@@ -30,29 +33,27 @@ const Auth = () => {
   };
   const handleSubmit = async (values, onSubmitProps) => {
     if (isSignup) {
-      const userData = await register(values, onSubmitProps,handleToast);
-      if(userData.status==="success"){
-        
+      const userData = await register(values, onSubmitProps, handleToast);
+      if (userData.status === "success") {
         dispatch(setLogin(userData));
         navigate("../home", { replace: true });
-      }
-      else{
-        handleToast("Something went wrong","error")
+      } else {
+        handleToast("Something went wrong", "error");
       }
     } else {
-      const userData = await login(values, onSubmitProps,handleToast);
+      const userData = await login(values, onSubmitProps, handleToast);
       dispatch(setLogin(userData));
       navigate("../home", { replace: true });
     }
   };
   const handleToast = (message, type) => {
-    if (type === 'success') {
+    if (type === "success") {
       toast.success(message);
-    } else if (type === 'error') {
+    } else if (type === "error") {
       toast.error(message);
     }
   };
- 
+
   const getValidationSchema = () => {
     if (isSignup) {
       return yup.object().shape({
@@ -112,17 +113,51 @@ const Auth = () => {
     formik.resetForm();
   };
 
+  const handleGoogleAuthSuccess = async (response) => {
+    const result = await googleLogin(response.profileObj);
+    console.log(result, "k");
+    if (result.status === "success") {
+      dispatch(setLogin(result));
+      navigate("../home", { replace: true });
+    } else {
+      handleToast("Something went wrong", "error");
+    }
+  };
+
+  const handleGoogleAuthFailure = (error) => {
+    // Handle Google authentication failure
+    console.error("Google authentication failed:", error);
+  };
+
+  useEffect(() => {
+    const initializeGoogleClient = () => {
+      gapi.load("client:auth2", () => {
+        gapi.client.init({
+          clientId:
+            "19614587769-2bsfr3g33qnlbof8p92uq7tll28pv898.apps.googleusercontent.com",
+          plugin_name: "chat",
+        });
+      });
+    };
+
+    // Call the function to initialize the Google client
+    initializeGoogleClient();
+  }, []);
   return (
-    <Container component="main" maxWidth="xs"   style={{
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      height: "100vh",
-    }}>
+    <Container
+      component='main'
+      maxWidth='xs'
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        height: "100vh",
+      }}
+    >
       {/* <ToastContainer position="bottom-left" /> */}
       <Paper className={classes.paper} elevation={6}>
         <Avatar className={classes.avatar}></Avatar>
-        <Typography component="h1" variant="h5">
+        <Typography component='h1' variant='h5'>
           {isSignup ? "Sign up" : "Sign in"}
         </Typography>
         <form className={classes.form} onSubmit={formik.handleSubmit}>
@@ -130,8 +165,8 @@ const Auth = () => {
             {isSignup && (
               <>
                 <Input
-                  name="name"
-                  label="Name"
+                  name='name'
+                  label='Name'
                   handleChange={formik.handleChange}
                   value={formik.values.name}
                   error={formik.errors.name}
@@ -139,8 +174,8 @@ const Auth = () => {
                   half
                 />
                 <Input
-                  name="userName"
-                  label="UserName"
+                  name='userName'
+                  label='UserName'
                   handleChange={formik.handleChange}
                   value={formik.values.userName}
                   error={formik.errors.userName}
@@ -150,8 +185,8 @@ const Auth = () => {
             )}
             {!isSignup && (
               <Input
-                name="userName"
-                label="UserName"
+                name='userName'
+                label='UserName'
                 handleChange={formik.handleChange}
                 value={formik.values.userName}
                 error={formik.errors.userName}
@@ -161,27 +196,27 @@ const Auth = () => {
             {isSignup && (
               <>
                 <Input
-                  name="number"
-                  label="Number"
+                  name='number'
+                  label='Number'
                   handleChange={formik.handleChange}
                   value={formik.values.number}
                   error={formik.errors.number}
-                  type="number"
+                  type='number'
                 />
                 <Input
-                  name="email"
-                  label="Email Address"
+                  name='email'
+                  label='Email Address'
                   handleChange={formik.handleChange}
                   value={formik.values.email}
                   error={formik.errors.email}
-                  type="email"
+                  type='email'
                 />
               </>
             )}
 
             <Input
-              name="password"
-              label="Password"
+              name='password'
+              label='Password'
               handleChange={formik.handleChange}
               value={formik.values.password}
               error={formik.errors.password}
@@ -190,25 +225,38 @@ const Auth = () => {
             />
             {isSignup && (
               <Input
-                name="confirmPassword"
-                label="Repeat Password"
+                name='confirmPassword'
+                label='Repeat Password'
                 handleChange={formik.handleChange}
                 value={formik.values.confirmPassword}
                 error={formik.errors.confirmPassword}
-                type="password"
+                type='password'
               />
             )}
           </Grid>
           <Button
-            type="submit"
+            type='submit'
             fullWidth
-            variant="contained"
-            color="primary"
+            variant='contained'
+            color='primary'
             className={classes.submit}
+            style={{ margin: "16px 0 16px" }}
           >
             {isSignup ? "Sign Up" : "Sign In"}
           </Button>
-          <Grid container justifyContent="flex-end">
+
+         
+
+          <Grid container justifyContent='space-between'>
+          <GoogleLogin
+            clientId='19614587769-2bsfr3g33qnlbof8p92uq7tll28pv898.apps.googleusercontent.com'
+            buttonText='Google Sign In'
+            onSuccess={handleGoogleAuthSuccess}
+            onFailure={handleGoogleAuthFailure}
+            cookiePolicy={"single_host_origin"}
+            style={{ minWidth: "100%", marginBottom: "8px" }}
+            className={classes.googleButton} // Add custom class to the Google button
+          />
             <Grid item>
               <Button onClick={switchMode}>
                 {isSignup
@@ -219,7 +267,7 @@ const Auth = () => {
           </Grid>
         </form>
       </Paper>
-      <ToastContainer position="bottom-center"/>
+      <ToastContainer position='bottom-center' />
     </Container>
   );
 };

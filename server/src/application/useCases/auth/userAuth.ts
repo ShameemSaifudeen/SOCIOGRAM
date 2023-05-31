@@ -14,28 +14,32 @@ export const userRegister = async (
   },
   userRepository: ReturnType<UserDbInterface>,
   authService: ReturnType<AuthServiceInterface>
-) => {  
+) => {
   user.email = user.email.toLowerCase();
   const isExistingEmail = await userRepository.getUserByEmail(user.email);
-  const isExistingUserName = await userRepository.getUserByUserName(user.userName)
-  if(isExistingUserName){
-    throw new AppError("This Username is already taken",HttpStatus.UNAUTHORIZED)
+  const isExistingUserName = await userRepository.getUserByUserName(
+    user.userName
+  );
+  if (isExistingUserName) {
+    throw new AppError(
+      "This Username is already taken",
+      HttpStatus.UNAUTHORIZED
+    );
   }
   if (isExistingEmail) {
-    console.log("existing email: ")
-    throw new AppError("An account is already registered with this mail", HttpStatus.UNAUTHORIZED);
+    throw new AppError(
+      "An account is already registered with this mail",
+      HttpStatus.UNAUTHORIZED
+    );
   }
-  if(user.password.length<=3){
-    console.log("password length is 0: ")
+  if (user.password.length <= 3) {
     throw new AppError("Password Empty", HttpStatus.BAD_REQUEST);
   }
   user.password = await authService.encryptPassword(user.password);
   const users = await userRepository.addUser(user);
-  const userId=users._id
+  const userId = users._id;
   const token = authService.generateToken(userId.toString());
-  return {token,
-  user: users
-  };
+  return { token, user: users };
 };
 export const userLogin = async (
   userName: string,
@@ -43,14 +47,42 @@ export const userLogin = async (
   userRepository: ReturnType<UserDbInterface>,
   authService: ReturnType<AuthServiceInterface>
 ) => {
-  const user:any= await userRepository.getUserByUserName(userName)
-  if(!user){
-    throw new AppError("This user does not exist",HttpStatus.UNAUTHORIZED)
+  const user: any = await userRepository.getUserByUserName(userName);
+  if (!user) {
+    throw new AppError("This user does not exist", HttpStatus.UNAUTHORIZED);
   }
-  const isPasswordCorrect = await authService.comparePassword(password,user.password)
-  if(!isPasswordCorrect){
-    throw new AppError("Sorry, your password was incorrect. Please check your password",HttpStatus.UNAUTHORIZED,)
+  const isPasswordCorrect = await authService.comparePassword(
+    password,
+    user.password
+  );
+  if (!isPasswordCorrect) {
+    throw new AppError(
+      "Sorry, your password was incorrect. Please check your password",
+      HttpStatus.UNAUTHORIZED
+    );
   }
-  const token = authService.generateToken(user._id.toString())
-  return {token,user}
+  const token = authService.generateToken(user._id.toString());
+  return { token, user };
+};
+export const googleLogin = async (
+  userName: string,
+  name: string,
+  email: string,
+  userRepository: ReturnType<UserDbInterface>,
+  authService: ReturnType<AuthServiceInterface>
+) => {
+  const user = {
+    userName,
+    name,
+    email,
+  };
+  const isUserExist = await userRepository.getUserByEmail(email);
+  if (isUserExist) {
+    const token = authService.generateToken(isUserExist._id.toString());
+    return { token, user: isUserExist };
+  } else {
+    const userDetails = await userRepository.addUser(user);
+    const token = authService.generateToken(userDetails._id.toString());
+    return { token, user: userDetails };
+  }
 };

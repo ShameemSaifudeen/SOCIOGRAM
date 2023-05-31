@@ -1,31 +1,65 @@
-import { Box, Typography, useTheme } from "@mui/material";
-import { useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { Box, Typography, useTheme, Collapse, Button } from "@mui/material";
+import { useSelector, useDispatch } from "react-redux";
 import Friend from "../../components/Friend/Friend";
 import WidgetWrapper from "../../components/Widget/WidgetWrapper";
-import { useDispatch } from "react-redux";
-import { useEffect } from "react";
 import { getFollowers, getFollowing } from "../../api/userApi/userApi";
-import { setFollowers, setFollowing } from "../../state/slice";
+import {
+  setFollowers,
+  setFollowing,
+  setFriendFollowing,
+  setFriendFollowers,
+} from "../../state/slice";
 
 // eslint-disable-next-line react/prop-types
-const FriendListWidget = ({userId, isFollowingList = false }) => {
+const FriendListWidget = ({ userId, isFollowingList = false }) => {
   const dispatch = useDispatch();
-  // const userId = useSelector((state) => state.user._id);
   const token = useSelector((state) => state.token);
-  const followers = useSelector((state) => state.user.followers);
-  const following = useSelector((state) => state.user.following);
+  const id = useSelector((state) => state.user._id);
+  const { followers, following } = useSelector((state) => {
+    if (id === userId) {
+      return {
+        followers: state.user.followers,
+        following: state.user.following,
+      };
+    } else {
+      return {
+        followers: state.friendFollowers,
+        following: state.friendFollowing,
+      };
+    }
+  });
   const { palette } = useTheme();
+  const [expanded, setExpanded] = useState(false);
+
+  const displayedFriends = isFollowingList
+    ? following.slice(0, 2)
+    : followers.slice(0, 2);
+  const remainingFriends = isFollowingList
+    ? following.slice(2)
+    : followers.slice(2);
+
   const getFriends = async () => {
-    const followers = await getFollowers(userId, token);
-    const following = await getFollowing(userId, token);
-    dispatch(setFollowers({ followers: followers }));
-    dispatch(setFollowing({ following: following }));
+    const followersData = await getFollowers(userId, token);
+    const followingData = await getFollowing(userId, token);
+    if (id === userId) {
+      dispatch(setFollowers({ followers: followersData }));
+      dispatch(setFollowing({ following: followingData }));
+    } else {
+      dispatch(setFriendFollowers({ followers: followersData }));
+      dispatch(setFriendFollowing({ following: followingData }));
+    }
   };
+
+  const handleExpand = () => {
+    setExpanded(true);
+  };
+
   useEffect(() => {
     getFriends();
   }, []);
+
   return (
-    
     <WidgetWrapper>
       <Typography
         color={palette.neutral.dark}
@@ -35,29 +69,37 @@ const FriendListWidget = ({userId, isFollowingList = false }) => {
       >
         {isFollowingList ? "Following List" : "Followers List"}
       </Typography>
-      {isFollowingList ? (
-        <Box display='flex' flexDirection='column' gap='1.5rem'>
-          {following.map((following) => (
-            <Friend
-              key={following._id}
-              friendId={following._id}
-              name={following.userName}
-              subtitle={following.name}
-              userPicturePath={following.displayPhoto}
-            />
-          ))}
-        </Box>
+      {displayedFriends.length === 0 ? (
+        <Typography variant='body1' color={palette.text.secondary}>
+          No {isFollowingList ? "following" : "followers"} to display.
+        </Typography>
       ) : (
         <Box display='flex' flexDirection='column' gap='1.5rem'>
-          {followers.map((follower) => (
+          {displayedFriends.map((friend) => (
             <Friend
-              key={follower._id}
-              friendId={follower._id}
-              name={follower.userName}
-              subtitle={follower.name}
-              userPicturePath={follower.displayPhoto}
+              key={friend._id}
+              friendId={friend._id}
+              name={friend.userName}
+              subtitle={friend.name}
+              userPicturePath={friend.displayPicture}
             />
           ))}
+          {remainingFriends.length > 0 && !expanded && (
+            <Button variant='text' onClick={handleExpand}>
+              Show More
+            </Button>
+          )}
+          <Collapse in={expanded} timeout='auto'>
+            {remainingFriends.map((friend) => (
+              <Friend
+                key={friend._id}
+                friendId={friend._id}
+                name={friend.userName}
+                subtitle={friend.name}
+                userPicturePath={friend.displayPicture}
+              />
+            ))}
+          </Collapse>
         </Box>
       )}
     </WidgetWrapper>

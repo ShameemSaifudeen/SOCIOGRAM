@@ -9,37 +9,43 @@ import FriendListWidget from "../Widgets/FriendList";
 
 const HomePage = () => {
   const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
-    const { _id, displayPhoto } = useSelector((state) => state.user);
-  
+  const { _id, displayPicture } = useSelector((state) => state.user);
 
   return (
-    <Box >
+    <Box>
       <Navbar />
-      <Box 
-        width="100%"
-        padding="7rem 6%"
+      <Box
+        width='100%'
+        padding='7rem 6%'
         display={isNonMobileScreens ? "flex" : "block"}
-        gap="0.5rem"
-        justifyContent="space-between"
+        gap='0.5rem'
+        justifyContent='space-between'
       >
-        <Box flexBasis={isNonMobileScreens ? "26%" : undefined}>
+        <Box  height="fit-content"
+          position="sticky"
+          top="7rem" flexBasis={isNonMobileScreens ? "26%" : undefined}>
           <UserWidget userId={_id} />
         </Box>
         <Box
           flexBasis={isNonMobileScreens ? "42%" : undefined}
           mt={isNonMobileScreens ? undefined : "2rem"}
+          
         >
-          <MyPostWidget picturePath={displayPhoto} />
+          <MyPostWidget picturePath={displayPicture} />
           <PostsWidget userId={_id} />
         </Box>
         {isNonMobileScreens && (
-          <Box flexBasis="26%">
+          <Box
+            flexBasis='26%'
+          
+          >
             {/* can place another widget here */}
-            <FriendListWidget />
-            <Box m="2rem 0" />
-            <FriendListWidget userId={_id} isFollowingList ={true} />
+            <FriendListWidget userId={_id} />
 
-            <Box m="2rem 0" />
+            <Box m='2rem 0' />
+            <FriendListWidget userId={_id} isFollowingList={true} />
+
+            <Box m='2rem 0' />
           </Box>
         )}
       </Box>

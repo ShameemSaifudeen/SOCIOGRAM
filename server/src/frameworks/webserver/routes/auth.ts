@@ -25,7 +25,8 @@ const authRouter=()=>{
     router.post('/register',controller.registerUser)
 
     router.post('/login',controller.loginUser)
-
+    
+    router.post('/googleLogin',controller.googleLoginUser)
   
 
     return router

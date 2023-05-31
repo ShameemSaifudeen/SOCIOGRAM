@@ -1,74 +1,84 @@
-import {
-  EditOutlined,
-  DeleteOutlined,
-  AttachFileOutlined,
-  GifBoxOutlined,
-  ImageOutlined,
-  MicOutlined,
-  MoreHorizOutlined,
-} from "@mui/icons-material";
-import {
-  Box,
-  Divider,
-  Typography,
-  InputBase,
-  useTheme,
-  Button,
-  IconButton,
-  useMediaQuery,
-} from "@mui/material";
-import FlexBetween from "../../components/FlexBetween/FlexBetween";
+import React, { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { Box, Divider, Typography, InputBase, useTheme, Button, IconButton, useMediaQuery } from "@mui/material";
+import { EditOutlined, DeleteOutlined, AttachFileOutlined, GifBoxOutlined, ImageOutlined, MicOutlined, MoreHorizOutlined } from "@mui/icons-material";
 import Dropzone from "react-dropzone";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import UserImage from "../../components/UserImage/UserImage";
 import WidgetWrapper from "../../components/Widget/WidgetWrapper";
-import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { setPosts } from "../../state/slice";
+import FlexBetween from "../../components/FlexBetween/FlexBetween";
+import { setUpdatePost } from "../../state/slice";
 import { createPost } from "../../api/postRequest/postRequest";
-import { useNavigate } from "react-router-dom";
 
-// eslint-disable-next-line react/prop-types
 const MyPostWidget = ({ picturePath }) => {
   const dispatch = useDispatch();
   const [isImage, setIsImage] = useState(false);
   const [image, setImage] = useState(null);
   const [post, setPost] = useState("");
   const { palette } = useTheme();
-  const { _id, userName, dispalyPhoto } = useSelector((state) => state.user);
+  const { _id, userName } = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
-  const mediumMain = palette.neutral.mediumMain;
-  const medium = palette.neutral.medium;
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+
   const handlePost = async () => {
+    if (isImage && !image) {
+      toast.error("Please select an image");
+      return;
+    }
+
     const formData = new FormData();
     formData.append("userId", _id);
     formData.append("description", post);
+
     if (image) {
       formData.append("picture", image);
       formData.append("image", image.name);
       formData.append("userName", userName);
     }
+
     try {
       const posts = await createPost(token, formData);
-      dispatch(setPosts({ posts }));
+      dispatch(setUpdatePost({ posts: posts.newPost }));
       setImage(null);
       setPost("");
       setIsImage(false);
-      navigate(0)
+      navigate(0);
     } catch (error) {
-      // Handle error
       console.error("Error creating post:", error);
+      toast.error("An error occurred while creating the post");
     }
   };
+
+  const handleImageDrop = (acceptedFiles) => {
+    const selectedImage = acceptedFiles[0];
+    const isImageValid = selectedImage && selectedImage.type.includes("image");
+
+    if (isImageValid) {
+      setImage(selectedImage);
+    } else {
+      toast.error("Please select a valid image file (jpg/jpeg/png)");
+    }
+  };
+  
 
   return (
     <WidgetWrapper>
       <FlexBetween gap="1.5rem">
-        <UserImage image={dispalyPhoto} />
+        <UserImage image={picturePath} />
         <InputBase
           placeholder="What's on your mind..."
-          onChange={(e) => setPost(e.target.value)}
+          onChange={(e) => {
+            const value = e.target.value;
+            if (!value.startsWith(" ")) {
+              setPost(value);
+            }
+            // else{
+            //   setPost()
+            // }
+          }}
           value={post}
           sx={{
             width: "100%",
@@ -79,17 +89,8 @@ const MyPostWidget = ({ picturePath }) => {
         />
       </FlexBetween>
       {isImage && (
-        <Box
-          border={`1px solid ${medium}`}
-          borderRadius="5px"
-          mt="1rem"
-          p="1rem"
-        >
-          <Dropzone
-            acceptedFiles=".jpg,.jpeg,.png"
-            multiple={false}
-            onDrop={(acceptedFiles) => setImage(acceptedFiles[0])}
-          >
+        <Box border={`1px solid ${palette.neutral.medium}`} borderRadius="5px" mt="1rem" p="1rem">
+          <Dropzone acceptedFiles=".jpg,.jpeg,.png" multiple={false} onDrop={handleImageDrop}>
             {({ getRootProps, getInputProps }) => (
               <FlexBetween>
                 <Box
@@ -100,9 +101,7 @@ const MyPostWidget = ({ picturePath }) => {
                   sx={{ "&:hover": { cursor: "pointer" } }}
                 >
                   <input {...getInputProps()} />
-                  {!image ? (
-                    <p>Add Image Here</p>
-                  ) : (
+                  {!image ? <p>Add Image Here</p> : (
                     <FlexBetween>
                       <Typography>{image.name}</Typography>
                       <EditOutlined />
@@ -110,10 +109,7 @@ const MyPostWidget = ({ picturePath }) => {
                   )}
                 </Box>
                 {image && (
-                  <IconButton
-                    onClick={() => setImage(null)}
-                    sx={{ width: "15%" }}
-                  >
+                  <IconButton onClick={() => setImage(null)} sx={{ width: "15%" }}>
                     <DeleteOutlined />
                   </IconButton>
                 )}
@@ -127,11 +123,8 @@ const MyPostWidget = ({ picturePath }) => {
 
       <FlexBetween>
         <FlexBetween gap="0.25rem" onClick={() => setIsImage(!isImage)}>
-          <ImageOutlined sx={{ color: mediumMain }} />
-          <Typography
-            color={mediumMain}
-            sx={{ "&:hover": { cursor: "pointer", color: medium } }}
-          >
+          <ImageOutlined sx={{ color: palette.neutral.mediumMain }} />
+          <Typography color={palette.neutral.mediumMain} sx={{ "&:hover": { cursor: "pointer", color: palette.neutral.medium } }}>
             Image
           </Typography>
         </FlexBetween>
@@ -139,23 +132,23 @@ const MyPostWidget = ({ picturePath }) => {
         {isNonMobileScreens ? (
           <>
             <FlexBetween gap="0.25rem">
-              <GifBoxOutlined sx={{ color: mediumMain }} />
-              <Typography color={mediumMain}>Clip</Typography>
+              <GifBoxOutlined sx={{ color: palette.neutral.mediumMain }} />
+              <Typography color={palette.neutral.mediumMain}>Clip</Typography>
             </FlexBetween>
 
             <FlexBetween gap="0.25rem">
-              <AttachFileOutlined sx={{ color: mediumMain }} />
-              <Typography color={mediumMain}>Attachment</Typography>
+              <AttachFileOutlined sx={{ color: palette.neutral.mediumMain }} />
+              <Typography color={palette.neutral.mediumMain}>Attachment</Typography>
             </FlexBetween>
 
             <FlexBetween gap="0.25rem">
-              <MicOutlined sx={{ color: mediumMain }} />
-              <Typography color={mediumMain}>Audio</Typography>
+              <MicOutlined sx={{ color: palette.neutral.mediumMain }} />
+              <Typography color={palette.neutral.mediumMain}>Audio</Typography>
             </FlexBetween>
           </>
         ) : (
           <FlexBetween gap="0.25rem">
-            <MoreHorizOutlined sx={{ color: mediumMain }} />
+            <MoreHorizOutlined sx={{ color: palette.neutral.mediumMain }} />
           </FlexBetween>
         )}
 
@@ -171,6 +164,8 @@ const MyPostWidget = ({ picturePath }) => {
           POST
         </Button>
       </FlexBetween>
+
+      <ToastContainer position="center" autoClose={3000} hideProgressBar closeOnClick draggable pauseOnHover />
     </WidgetWrapper>
   );
 };
