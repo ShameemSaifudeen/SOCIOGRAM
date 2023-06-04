@@ -71,3 +71,41 @@ export const postUnLike = async (
   }
   return unLikedPost;
 };
+export const postEdit = async (
+  postId: string,
+  description: string,
+  repository: ReturnType<postDbInterfaceType>
+) => {
+  const editPost = await repository.editPost(postId,description);
+
+  if (!editPost) {
+    throw new AppError("Post not Found", HttpStatus.BAD_REQUEST);
+  }
+  return editPost;
+};
+export const addComment = async (
+  postId: string,
+  userId: string,
+  comment: string,
+  repository: ReturnType<postDbInterfaceType>
+) => {
+  const addComment = await repository.addComment(postId,userId,comment);
+
+  if (!addComment) {
+    throw new AppError("Post not Found", HttpStatus.BAD_REQUEST);
+  }
+  return addComment;
+};
+export const commentDelete = async (
+  postId: string,
+  userId: string,
+  index: number,
+  repository: ReturnType<postDbInterfaceType>
+) => {
+  const deleteComment = await repository.deleteComment(postId,userId,index);
+
+  if (!deleteComment) {
+    throw new AppError("Post not Found", HttpStatus.BAD_REQUEST);
+  }
+  return deleteComment;
+};

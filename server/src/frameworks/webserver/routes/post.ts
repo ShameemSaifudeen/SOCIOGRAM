@@ -14,6 +14,9 @@ const postRouter = () => {
   router.delete('/:id',controller.deletePost)
   router.put('/:id/like',controller.likePost)
   router.put('/:id/unlike',controller.UnLikePost)
+  router.put("/:postId",controller.editPost)
+  router.put("/:postId/comment",controller.commentPost)
+  router.put("/:postId/commentDelete",controller.deleteComment)
 
   return router;
 };

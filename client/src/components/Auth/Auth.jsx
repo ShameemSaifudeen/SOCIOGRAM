@@ -17,11 +17,9 @@ import "react-toastify/dist/ReactToastify.css";
 import { useDispatch } from "react-redux";
 import { setLogin } from "../../state/slice";
 import { register, login } from "../../api/AuthRequest/AuthRequest";
-import { GoogleLogin } from "react-google-login";
-import { useEffect } from "react";
-import { gapi } from "gapi-script";
 import { googleLogin } from "../../api/AuthRequest/AuthRequest";
-
+import { signInWithPopup } from "firebase/auth";
+import { auth,provider } from "../../api/FireBaseConfig/FireBaseConfIg";
 const Auth = () => {
   let classes = useStyles();
   const [showPassword, setShowPassword] = useState(false);
@@ -112,37 +110,25 @@ const Auth = () => {
     setIsSignup((prevIsSignup) => !prevIsSignup);
     formik.resetForm();
   };
+const handleGoogleLogin = async()=>{
+ await signInWithPopup(auth,provider).then(async (UserCredentials)=>{
+  const result = await googleLogin(UserCredentials.user);
+  if (result.status === "success") {
+    dispatch(setLogin(result));
+    navigate("../home", { replace: true });
+  } else {
+    handleToast("Something went wrong", "error");
+  }
+ }).catch((e)=>{
+  console.error("Google authentication failed:", e);
 
-  const handleGoogleAuthSuccess = async (response) => {
-    const result = await googleLogin(response.profileObj);
-    console.log(result, "k");
-    if (result.status === "success") {
-      dispatch(setLogin(result));
-      navigate("../home", { replace: true });
-    } else {
-      handleToast("Something went wrong", "error");
-    }
-  };
+  handleToast("Something went wrong", e);
 
-  const handleGoogleAuthFailure = (error) => {
-    // Handle Google authentication failure
-    console.error("Google authentication failed:", error);
-  };
+ })
+}
+ 
 
-  useEffect(() => {
-    const initializeGoogleClient = () => {
-      gapi.load("client:auth2", () => {
-        gapi.client.init({
-          clientId:
-            "19614587769-2bsfr3g33qnlbof8p92uq7tll28pv898.apps.googleusercontent.com",
-          plugin_name: "chat",
-        });
-      });
-    };
-
-    // Call the function to initialize the Google client
-    initializeGoogleClient();
-  }, []);
+  
   return (
     <Container
       component='main'
@@ -248,7 +234,7 @@ const Auth = () => {
          
 
           <Grid container justifyContent='space-between'>
-          <GoogleLogin
+          {/* <GoogleLogin
             clientId='19614587769-2bsfr3g33qnlbof8p92uq7tll28pv898.apps.googleusercontent.com'
             buttonText='Google Sign In'
             onSuccess={handleGoogleAuthSuccess}
@@ -256,7 +242,10 @@ const Auth = () => {
             cookiePolicy={"single_host_origin"}
             style={{ minWidth: "100%", marginBottom: "8px" }}
             className={classes.googleButton} // Add custom class to the Google button
-          />
+          /> */}
+
+<Button onClick={handleGoogleLogin}>Login with Google</Button>
+          
             <Grid item>
               <Button onClick={switchMode}>
                 {isSignup

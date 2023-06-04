@@ -156,7 +156,7 @@ const Navbar = () => {
               )}
             </IconButton>
             <Tooltip title='Chat' placement='bottom'>
-              <Message sx={{ fontSize: "25px" }} />
+              <Message sx={{ fontSize: "25px" }} onClick={() => navigate("/chat")}/>
             </Tooltip>
             <Tooltip title='Notification' placement='bottom'>
               <Notifications sx={{ fontSize: "25px" }} />

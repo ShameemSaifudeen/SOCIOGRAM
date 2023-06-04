@@ -1,11 +1,16 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
+import React, { useState } from "react";
 import {
   ChatBubbleOutlineOutlined,
   FavoriteBorderOutlined,
   FavoriteOutlined,
-  // MoreHorizOutlined,
   DeleteOutlined,
+  MoreHorizOutlined,
+  ReportOutlined,
+  AddComment,
 } from "@mui/icons-material";
+import { format } from "timeago.js";
 import {
   Box,
   Divider,
@@ -17,20 +22,27 @@ import {
   DialogContent,
   DialogActions,
   Button,
+  Popover,
+  TextField,
 } from "@mui/material";
 import FlexBetween from "../../components/FlexBetween/FlexBetween";
 import Friend from "../../components/Friend/Friend";
 import WidgetWrapper from "../../components/Widget/WidgetWrapper";
-import { getLike } from "../../api/postRequest/postRequest";
-import { useState } from "react";
+import {
+  commentAdd,
+  deleteComment,
+  editPost,
+  getLike,
+} from "../../api/postRequest/postRequest";
 import { useSelector, useDispatch } from "react-redux";
 import { setPost, deleteUpdate } from "../../state/slice";
 import { deletePost } from "../../api/postRequest/postRequest";
+import { useNavigate } from "react-router-dom";
 
-// eslint-disable-next-line react/prop-types
 const PostWidget = ({
   postId,
   postUserId,
+  postCreatedAt,
   name,
   description,
   image,
@@ -40,12 +52,18 @@ const PostWidget = ({
   isProfile,
 }) => {
   const [isComments, setIsComments] = useState(false);
-  const [isDeleteVisible, setIsDeleteVisible] = useState(false); // State to toggle delete confirmation dialog visibility
+  const [isDeleteVisible, setIsDeleteVisible] = useState(false);
+  const [isEditVisible, setIsEditVisible] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [editDescription, setEditDescription] = useState(description);
+  const [commentInput, setCommentInput] = useState("");
+  const navigate = useNavigate();
   const loggedInUserId = useSelector((state) => state.user._id);
   const isLiked = likes.includes(loggedInUserId);
-  const isCurrentUserPost = loggedInUserId === postUserId; // Check if the logged-in user is the post creator
+  const isCurrentUserPost = loggedInUserId === postUserId;
   const picturePath = true;
   const token = useSelector((state) => state.token);
+  const { userName } = useSelector((state) => state.user);
   const loggedUserId = useSelector((state) => state.user._id);
   const { palette } = useTheme();
   const main = palette.neutral.main;
@@ -53,6 +71,8 @@ const PostWidget = ({
   const dispatch = useDispatch();
   const likeCount = likes.length;
   const commentCount = comments.length;
+  const postTime = format(postCreatedAt);
+
   const handleLike = async () => {
     const result = await getLike(token, postId, loggedUserId);
     dispatch(setPost({ post: result.likedPost }));
@@ -60,18 +80,57 @@ const PostWidget = ({
   };
 
   const handleDelete = async () => {
-    // eslint-disable-next-line no-unused-vars
     const result = await deletePost(postId, token);
     dispatch(deleteUpdate(postId));
+    setIsDeleteVisible(false);
+  };
+  const handleDeleteComment = async (index,userId) => {
+    const result = await deleteComment(index,userId,postId,token)
+    dispatch(setPost({ post: result }));
+  };
+
+  const handleEdit = () => {
+    setIsEditVisible(true);
+    setAnchorEl(null);
+  };
+
+  const handleReport = () => {
+    // Implement your report logic here
+    setAnchorEl(null);
   };
 
   const handleDeleteConfirm = () => {
-    setIsDeleteVisible(false);
-    handleDelete();
+    setIsDeleteVisible(true);
   };
 
   const handleDeleteCancel = () => {
     setIsDeleteVisible(false);
+  };
+
+  const handlePopoverOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handlePopoverClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+
+  const handleSaveEdit = async () => {
+    console.log("Edited Description:", editDescription);
+    const result = await editPost(postId, editDescription, token);
+    dispatch(setPost({ post: result.editedPost }));
+    setIsEditVisible(false);
+  };
+
+  const handleAddComment = async () => {
+    const comment = `${userName}: ${commentInput}`;
+    console.log(comment);
+    const result = await commentAdd(loggedUserId, postId, comment, token);
+    dispatch(setPost({ post: result }));
+    console.log("Added comment:", commentInput);
+    setCommentInput("");
   };
 
   return (
@@ -79,7 +138,7 @@ const PostWidget = ({
       <Friend
         friendId={postUserId}
         name={name}
-        subtitle='kollam'
+        subtitle={postTime}
         userPicturePath=''
       />
       <Typography color={main} sx={{ mt: "1rem" }}>
@@ -115,21 +174,142 @@ const PostWidget = ({
           </FlexBetween>
         </FlexBetween>
 
-        {isCurrentUserPost && (
-          <IconButton onClick={() => setIsDeleteVisible(true)}>
-            <DeleteOutlined />
-          </IconButton>
+        {isProfile ? (
+          isCurrentUserPost ? (
+            <div>
+              <IconButton
+                onClick={handlePopoverOpen}
+                aria-describedby='more-options'
+              >
+                <MoreHorizOutlined />
+              </IconButton>
+              <Popover
+                id='more-options'
+                open={open}
+                anchorEl={anchorEl}
+                onClose={handlePopoverClose}
+                anchorOrigin={{
+                  vertical: "bottom",
+                  horizontal: "right",
+                }}
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+              >
+                <Box p={2}>
+                  <Button onClick={handleEdit}>Edit</Button>
+                  <Button onClick={handleDeleteConfirm} color='error'>
+                    Delete
+                  </Button>
+                </Box>
+              </Popover>
+            </div>
+          ) : (
+            <div>
+              <IconButton
+                onClick={handlePopoverOpen}
+                aria-describedby='more-options'
+              >
+                <MoreHorizOutlined />
+              </IconButton>
+              <Popover
+                id='more-options'
+                open={open}
+                anchorEl={anchorEl}
+                onClose={handlePopoverClose}
+                anchorOrigin={{
+                  vertical: "bottom",
+                  horizontal: "right",
+                }}
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+              >
+                <Box p={2}>
+                  <Button onClick={handleReport}>Report</Button>
+                </Box>
+              </Popover>
+            </div>
+          )
+        ) : (
+          <div>
+            <IconButton
+              onClick={handlePopoverOpen}
+              aria-describedby='more-options'
+            >
+              <MoreHorizOutlined />
+            </IconButton>
+            <Popover
+              id='more-options'
+              open={open}
+              anchorEl={anchorEl}
+              onClose={handlePopoverClose}
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "right",
+              }}
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+            >
+              <Box p={2}>
+                <Button onClick={handleReport}>Report</Button>
+              </Box>
+            </Popover>
+          </div>
         )}
       </FlexBetween>
       {isComments && (
         <Box mt='0.5rem'>
-          <Box>
-            <Divider />
-            <Typography sx={{ color: main, m: "0.5rem 0", pl: "1rem" }}>
-              Nice
-            </Typography>
+          {comments.map(({ userId, comment }, index) => (
+            <React.Fragment key={index}>
+              <Box>
+                <Divider />
+                <FlexBetween alignItems='center'>
+                  <Typography
+                    onClick={() => navigate(`/profile/${userId}`)}
+                    sx={{
+                      "&:hover": {
+                        color: palette.primary.light,
+                        cursor: "pointer",
+                      },
+                      color: main,
+                      m: "0.5rem 0",
+                      pl: "1rem",
+                    }}
+                  >
+                    {comment}
+                  </Typography>
+                  {(isCurrentUserPost || userId === loggedUserId) && (
+                    <IconButton
+                      onClick={() => handleDeleteComment(index,userId)}
+                      size='small'
+                    >
+                      <DeleteOutlined />
+                    </IconButton>
+                  )}
+                </FlexBetween>
+              </Box>
+              <Divider />
+            </React.Fragment>
+          ))}
+
+          <Box display='flex' alignItems='center' mt='0.5rem'>
+            <TextField
+              variant='outlined'
+              fullWidth
+              label='Add a comment...'
+              size='small'
+              value={commentInput}
+              onChange={(e) => setCommentInput(e.target.value)}
+            />
+            <Button variant='contained' size='small' onClick={handleAddComment}  disabled={!commentInput.trim()}>
+              Post
+            </Button>
           </Box>
-          <Divider />
         </Box>
       )}
 
@@ -140,12 +320,28 @@ const PostWidget = ({
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDeleteCancel}>Cancel</Button>
-          <Button
-            onClick={handleDeleteConfirm}
-            color='error'
-            variant='contained'
-          >
+          <Button onClick={handleDelete} color='error'>
             Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={isEditVisible} onClose={() => setIsEditVisible(false)}>
+        <DialogTitle>Edit Post</DialogTitle>
+        <DialogContent>
+          <TextField
+            variant='outlined'
+            fullWidth
+            multiline
+            rows={4}
+            label='Edit description'
+            value={editDescription}
+            onChange={(e) => setEditDescription(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setIsEditVisible(false)}>Cancel</Button>
+          <Button onClick={handleSaveEdit} color='primary'>
+            Save
           </Button>
         </DialogActions>
       </Dialog>

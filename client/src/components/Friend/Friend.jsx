@@ -5,11 +5,11 @@ import { useNavigate } from "react-router-dom";
 import FlexBetween from "../FlexBetween/FlexBetween";
 import UserImage from "../UserImage/UserImage";
 import { followReq, getUser } from "../../api/userApi/userApi";
-import { setFollowers, setFollowing } from "../../state/slice";
+import { setFollowers, setFollowing, setFriendFollowers } from "../../state/slice";
 import { useEffect, useState } from "react";
 
 // eslint-disable-next-line react/prop-types
-const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
+const Friend = ({ friendId, name, subtitle, userPicturePath,handleRequest }) => {
   const [user, setUser] = useState();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -26,6 +26,7 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
     const response = await followReq(userId, friendId, token);
     dispatch(setFollowers({ followers: response.followers }));
     dispatch(setFollowing({ following: response.following }));
+    handleRequest()
   };
   const getuser = async () => {
     const result = await getUser(friendId, token);
@@ -33,7 +34,7 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
   };
   useEffect(() => {
     getuser();
-  }, []);
+  }, [userId]);
   return (
     <FlexBetween>
       <FlexBetween gap='1rem'>
@@ -62,17 +63,18 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
           </Typography>
         </Box>
       </FlexBetween>
-      <IconButton
-        disabled={userId === friendId}
-        onClick={() => followRequest()}
-        sx={{ backgroundColor: primaryLight, p: "0.6rem" }}
-      >
-        {isFollowing ? (
-          <PersonRemoveOutlined sx={{ color: primaryDark }} />
-        ) : (
-          <PersonAddOutlined sx={{ color: primaryDark }} />
-        )}
-      </IconButton>
+      {userId !== friendId && (
+        <IconButton
+          onClick={() => followRequest()}
+          sx={{ backgroundColor: primaryLight, p: "0.6rem" }}
+        >
+          {isFollowing ? (
+            <PersonRemoveOutlined sx={{ color: primaryDark }} />
+          ) : (
+            <PersonAddOutlined sx={{ color: primaryDark }} />
+          )}
+        </IconButton>
+      )}
     </FlexBetween>
   );
 };

@@ -15,10 +15,7 @@ const postSchema = new Schema(
     },
     likes: [],
     comments: [],
-    createdAt: {
-      type: Date,
-      default: new Date(),
-    },
+
     image: String,
   },
   {

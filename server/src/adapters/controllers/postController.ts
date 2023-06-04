@@ -3,7 +3,7 @@ import asyncHandler from "express-async-handler";
 import { resolve } from "path";
 import { postRepositoryType } from "../../frameworks/database/Mongodb/repositories/postRepository";
 import { postDbInterfaceType } from "../../application/repositories/postDbRepositoryInterface";
-import { postCreate ,getAllPosts, getUserPosts, postDelete, postLike, postUnLike} from "../../application/useCases/post/post";
+import { postCreate ,getAllPosts, getUserPosts, postDelete, postLike, postUnLike, postEdit, addComment, commentDelete} from "../../application/useCases/post/post";
 
 const postController = (
   postDbInterface: postDbInterfaceType,
@@ -65,13 +65,46 @@ const postController = (
       unLikedPost
     })
   })
+  const editPost = asyncHandler( async (req: Request, res: Response) => {
+    const{postId} = req.params
+    const {description} = req.body
+    const editedPost = await postEdit(postId,description,dbRepositoryPost)
+    res.json({
+      status: "success",
+      message: "Successfully editedPost",
+      editedPost
+    })
+  })
+  const commentPost = asyncHandler( async (req: Request, res: Response) => {
+    const{postId} = req.params
+    const {userId,comment} = req.body
+    const commentAdded = await addComment(postId,userId,comment,dbRepositoryPost)
+    res.json({
+      status: "success",
+      message: "Successfully commentAdded",
+      commentAdded
+    })
+  })
+  const deleteComment = asyncHandler( async (req: Request, res: Response) => {
+    const{postId} = req.params
+    const {userId,index} = req.body
+    const deletedComment = await commentDelete(postId,userId,index,dbRepositoryPost)
+    res.json({
+      status: "success",
+      message: "Successfully commentAdded",
+      deletedComment
+    })
+  })
   return {
     createPost,
     getPosts,
     getUserPost,
     deletePost,
     likePost,
-    UnLikePost
+    UnLikePost,
+    editPost,
+    commentPost,
+    deleteComment
   };
 };
 export default postController;

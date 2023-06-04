@@ -45,7 +45,7 @@ const MyPostWidget = ({ picturePath }) => {
       setImage(null);
       setPost("");
       setIsImage(false);
-      navigate(0);
+      // navigate(0);
     } catch (error) {
       console.error("Error creating post:", error);
       toast.error("An error occurred while creating the post");

@@ -4,15 +4,30 @@ import http from 'http'
 import serverConfig from './frameworks/webserver/server';
 import expressConfig from './frameworks/webserver/express';
 import routes from './frameworks/webserver/routes';
+import { Server } from 'socket.io';
+import socketConfig from './frameworks/webSocket/socket';
 import Colors = require ('colors.ts')
 import errorHandlingMidlleware from './frameworks/webserver/middlewares/errorHandlingMiddleware';
 import AppError from './utils/appError';
 import path from 'path'
+import configKeys from './config';
+import cors from "cors";
+
+
 
 Colors.enable
 
 const app:Application = express();
 const server = http.createServer(app);
+// app.use(cors())
+const io = new Server(server,{
+    cors:{
+        origin:"http://localhost:5173",
+        methods:["GET","POST"]
+    }
+});
+
+socketConfig(io)  
 
 //connecting mongoDb
 connectDB();

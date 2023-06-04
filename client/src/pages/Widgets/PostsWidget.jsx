@@ -8,20 +8,20 @@ import { getPosts, getUserPosts } from "../../api/postRequest/postRequest";
 const PostsWidget = ({ userId, isProfile = false }) => {
   const dispatch = useDispatch();
   const posts = useSelector((state) => state.posts);
-
   const token = useSelector((state) => state.token);
   const [post, setPost] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const getPost = async () => {
     const response = await getPosts(token);
     const data = await response;
-    // setPost(datas)
     dispatch(setPosts({ posts: data.posts }));
+    setIsLoading(false);
   };
   const userPosts = async () => {
     const response = await getUserPosts(userId, token);
     const data = await response;
-    // setPost(datas)
     dispatch(setPosts({ posts: data.posts }));
+    setIsLoading(false);
   };
   const buttonlicked = () => {
     setPost(!post);
@@ -33,22 +33,30 @@ const PostsWidget = ({ userId, isProfile = false }) => {
       getPost();
     }
   }, [post, isProfile, userId]); // eslint-disable-line react-hooks/exhaustive-deps
+
   return (
     <>
-      {posts.map(
-        ({ _id, userId, userName, description, image, likes, comments }) => (
-          <PostWidget
-            key={_id}
-            postId={_id}
-            postUserId={userId}
-            name={userName}
-            description={description}
-            image={image}
-            likes={likes}
-            comments={comments}
-            buttonlicked={buttonlicked}
-            isProfile={isProfile ? isProfile : false}
-          />
+      {isLoading ? (
+        <p>Loading...</p>
+      ) : posts.length === 0 ? (
+        <p>No posts to show</p>
+      ) : (
+        posts.map(
+          ({ _id, userId, userName, description, image, likes, comments, createdAt }) => (
+            <PostWidget
+              key={_id}
+              postId={_id}
+              postUserId={userId}
+              postCreatedAt={createdAt}
+              name={userName}
+              description={description}
+              image={image}
+              likes={likes}
+              comments={comments}
+              buttonlicked={buttonlicked}
+              isProfile={isProfile ? isProfile : false}
+            />
+          )
         )
       )}
     </>

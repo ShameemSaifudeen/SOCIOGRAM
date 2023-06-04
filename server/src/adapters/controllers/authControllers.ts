@@ -52,8 +52,11 @@ const authController = (
     });
   });
   const googleLoginUser = asyncHandler(async (req: Request, res: Response) => {
-    const userName: string = req.body?.givenName;
-    const name: string = req.body?.name;
+    console.log(req.body);
+    
+    // const firstName = req.body?.displayName.split(" ")[0];
+    const userName: string = req.body?.displayName;
+    const name: string = req.body?.displayName;
     const email: string = req.body?.email;
     const token = await googleLogin(
       userName,

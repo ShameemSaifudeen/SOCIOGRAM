@@ -8,7 +8,8 @@ const initialState = {
     followers: [],
     following: [],
     friendFollowers: [],
-    friendFollowing: []
+    friendFollowing: [],
+    chatUsers:[]
 
 };
 
@@ -40,7 +41,7 @@ export const authSlice = createSlice({
         },
         setUpdatePost: (state, action) => {
 
-            state.posts.push(action.payload.posts)
+            state.posts.shift(action.payload.posts)
         },
         setPost: (state, action) => {
             const updatedPosts = state.posts.map((post) => {
@@ -62,7 +63,7 @@ export const authSlice = createSlice({
         },
         setUpdateFriendFollowers: (state, action) => {
             // state.friendFollowers = action.payload?.followers;
-            console.log(state,action,"><><><<>");
+            console.log(state.friendFollowers,"><><><<>");
         },
         setFriendFollowing: (state, action) => {
             state.friendFollowing = action.payload?.following;
@@ -78,10 +79,13 @@ export const authSlice = createSlice({
         deleteUpdate: (state, action) => {
             const postId = action.payload;
             state.posts = state.posts.filter((post) => post._id !== postId);
+        },
+        setChatUsers: (state, action) => {
+            state.chatUsers=action.payload.user
         }
 
     },
 });
 
-export const { setMode, setLogin, setLogout, setPosts, setPost, setUpdatePost, setFollowers,setUpdateFriendFollowers, setFollowing, setUpdate, deleteUpdate, setFriendFollowers, setFriendFollowing } = authSlice.actions;
+export const { setMode, setLogin, setLogout, setPosts, setPost, setUpdatePost, setFollowers,setUpdateFriendFollowers, setFollowing, setUpdate, deleteUpdate, setFriendFollowers, setFriendFollowing,setChatUsers } = authSlice.actions;
 export default authSlice.reducer;

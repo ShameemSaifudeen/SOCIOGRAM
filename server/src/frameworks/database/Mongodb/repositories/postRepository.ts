@@ -13,10 +13,10 @@ export const postRepositoryImp = () => {
     return await newPost.save();
   };
   const getAllPost = async () => {
-    return await Post.find();
+    return await Post.find().sort({ createdAt: -1 });
   };
   const getUserPosts = async (id: string) => {
-    return await Post.find({ userId: id });
+    return await Post.find({ userId: id }).sort({ createdAt: -1 });
   };
   const deletePost = async (id: string) => {
     const postDeleted: any = await Post.findByIdAndDelete({ _id: id });
@@ -60,6 +60,51 @@ export const postRepositoryImp = () => {
     }
     return post;
   };
+  const editPost = async (postId: string, description: string) => {
+    try {
+      const updatedPost = await Post.findByIdAndUpdate(
+        postId,
+        { description },
+        { new: true }
+      );
+      return updatedPost;
+    } catch (error) {
+      console.error(error);
+      // Handle error
+    }
+  };
+
+  const addComment = async (postId:string, userId:string , comment:string) => {
+    try {
+      const updatedPost = await Post.findByIdAndUpdate(
+        postId,
+        { $push: { comments: { userId, comment } } },
+        { new: true }
+      );
+      return updatedPost;
+    } catch (error) {
+      console.error(error);
+      // Handle error
+    }
+  };
+  const deleteComment = async (postId:string, userId:string , index:number) => {
+    try {
+      const post = await Post.findById(postId);
+  
+      if (!post) {
+        // Handle case when post is not found
+        return;
+      }
+  
+      post.comments.splice(index, 1);
+      await post.save();
+  
+      return post;
+    } catch (error) {
+      console.error(error);
+      // Handle error
+    }
+  };
   return {
     createPost,
     getAllPost,
@@ -67,6 +112,9 @@ export const postRepositoryImp = () => {
     deletePost,
     likePost,
     unLikePost,
+    editPost,
+    addComment,
+    deleteComment
   };
 };
 

@@ -12,8 +12,9 @@ import {
 } from "../../state/slice";
 
 // eslint-disable-next-line react/prop-types
-const FriendListWidget = ({ userId, isFollowingList = false }) => {
+const FriendListWidget = ({ userId, isFollowingList = false, handleEffect }) => {
   const dispatch = useDispatch();
+  const [click,setClick] = useState(false)
   const token = useSelector((state) => state.token);
   const id = useSelector((state) => state.user._id);
   const { followers, following } = useSelector((state) => {
@@ -29,6 +30,10 @@ const FriendListWidget = ({ userId, isFollowingList = false }) => {
       };
     }
   });
+  const handleRequest = () => {
+    setClick(!click)
+    handleEffect()
+  }
   const { palette } = useTheme();
   const [expanded, setExpanded] = useState(false);
 
@@ -45,6 +50,7 @@ const FriendListWidget = ({ userId, isFollowingList = false }) => {
     if (id === userId) {
       dispatch(setFollowers({ followers: followersData }));
       dispatch(setFollowing({ following: followingData }));
+
     } else {
       dispatch(setFriendFollowers({ followers: followersData }));
       dispatch(setFriendFollowing({ following: followingData }));
@@ -57,7 +63,7 @@ const FriendListWidget = ({ userId, isFollowingList = false }) => {
 
   useEffect(() => {
     getFriends();
-  }, []);
+  }, [userId]);
 
   return (
     <WidgetWrapper>
@@ -82,6 +88,7 @@ const FriendListWidget = ({ userId, isFollowingList = false }) => {
               name={friend.userName}
               subtitle={friend.name}
               userPicturePath={friend.displayPicture}
+              handleRequest={handleRequest}
             />
           ))}
           {remainingFriends.length > 0 && !expanded && (
@@ -92,11 +99,12 @@ const FriendListWidget = ({ userId, isFollowingList = false }) => {
           <Collapse in={expanded} timeout='auto'>
             {remainingFriends.map((friend) => (
               <Friend
-                key={friend._id}
-                friendId={friend._id}
-                name={friend.userName}
-                subtitle={friend.name}
-                userPicturePath={friend.displayPicture}
+                key={friend?._id}
+                friendId={friend?._id}
+                name={friend?.userName}
+                subtitle={friend?.name}
+                userPicturePath={friend?.displayPicture}
+                handleRequest={handleRequest}
               />
             ))}
           </Collapse>
