@@ -15,6 +15,7 @@ const postSchema = new Schema(
     },
     likes: [],
     comments: [],
+    report:[],
 
     image: String,
   },

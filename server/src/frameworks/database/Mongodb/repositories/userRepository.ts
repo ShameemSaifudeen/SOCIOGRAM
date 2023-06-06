@@ -26,6 +26,33 @@ export const userRepositoryMongoDB = () => {
     const user: any = await User.findOne({ _id: id });
     return user;
   };
+  const getAllUsers = async () => {
+    try {
+      const usersWithPosts = await User.aggregate([
+        {
+          $lookup: {
+            from: 'posts',
+            let: { userId: { $toString: '$_id' } }, // Convert _id to string
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $eq: ['$userId', '$$userId'], // Compare as string
+                  },
+                },
+              },
+            ],
+            as: 'posts',
+          },
+        },
+      ]);
+  
+      return usersWithPosts;
+    }  catch (error) {
+      console.error('Error fetching users:', error);
+      throw error;
+    }
+  };
   const userSearch = async (name: string) => {
     const user: any = await User.find({
       name: { $regex: `^${name}`, $options: "i" },
@@ -154,10 +181,25 @@ export const userRepositoryMongoDB = () => {
 
     return following;
   };
+  const userHandle = async (id: string) => {
+    try {
+      const user: any = await User.findOne({ _id: id });
+      if (!user) {
+        return;
+      }
+      const newIsBlocked = !user.isBlocked;
+      user.isBlocked = newIsBlocked;
+      return await user.save();
+    } catch (error) {
+      console.error(`Error updating user with ID ${id}:`, error);
+    }
+  };
+  
 
   return {
     addUser,
     getUserByEmail,
+    getAllUsers,
     getUserByUserName,
     getUserById,
     followUser,
@@ -166,6 +208,7 @@ export const userRepositoryMongoDB = () => {
     userSearch,
     followersList,
     followingList,
+    userHandle
   };
 };
 

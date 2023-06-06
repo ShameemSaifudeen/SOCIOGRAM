@@ -9,10 +9,13 @@ import Home from "./pages/Home/Home";
 import Auth from "./components/Auth/Auth";
 import ProfilePage from "./pages/Profile/Profile";
 import ChatPage from "./pages/Chat/Chat";
+import AdminLogin from "./pages/AdminLogin/AdminLogin";
+import AdminHome from "./pages/AdminHome/AdminHome";
 function App() {
   const mode = useSelector((state) => state.mode);
   const theme = useMemo(() => createTheme(themeSettings(mode)), [mode]);
   const token = useSelector((state) => state.token);
+  const adminToken = useSelector((state) => state.adminToken);
 
   return (
     <div className='app'>
@@ -37,8 +40,18 @@ function App() {
               element={token ? <ProfilePage /> : <Navigate to='/' />}
             />
             <Route
-              path='/chat/' element={<ChatPage/>}
-              // element={token ? <ProfilePage /> : <Navigate to='/' />}
+              path='/chat/'
+              element={token ? <ChatPage /> : <Navigate to='/' />}
+            />
+            <Route
+              path='/admin'
+              element={
+                adminToken ? <Navigate to='/admin/home' /> : <AdminLogin />
+              }
+            />
+            <Route
+              path='/admin/home'
+              element={adminToken ? <AdminHome /> : <Navigate to='/admin' />}
             />
           </Routes>
         </ThemeProvider>

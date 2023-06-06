@@ -234,15 +234,6 @@ const handleGoogleLogin = async()=>{
          
 
           <Grid container justifyContent='space-between'>
-          {/* <GoogleLogin
-            clientId='19614587769-2bsfr3g33qnlbof8p92uq7tll28pv898.apps.googleusercontent.com'
-            buttonText='Google Sign In'
-            onSuccess={handleGoogleAuthSuccess}
-            onFailure={handleGoogleAuthFailure}
-            cookiePolicy={"single_host_origin"}
-            style={{ minWidth: "100%", marginBottom: "8px" }}
-            className={classes.googleButton} // Add custom class to the Google button
-          /> */}
 
 <Button onClick={handleGoogleLogin}>Login with Google</Button>
           

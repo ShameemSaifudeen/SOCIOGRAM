@@ -10,6 +10,8 @@ import {
   followingList,
   profileUpdate,
   userSearch,
+  allUsers,
+  userHandle,
 } from "../../application/useCases/user/user";
 import { UserRepositoryMongoDB } from "../../frameworks/database/Mongodb/repositories/userRepository";
 
@@ -24,6 +26,15 @@ const userController = (
     res.json({
       status: "success",
       user,
+    });
+  });
+  const getAllUsers = asyncHandler(async (req: Request, res: Response) => {
+    console.log("LL");
+    
+    const users = await allUsers(dbRepositoryUser);
+    res.json({
+      status: "success",
+      users,
     });
   });
   const updateProfile = asyncHandler(async (req: Request, res: Response) => {
@@ -100,14 +111,24 @@ const userController = (
       following,
     });
   });
+  const handleUser = asyncHandler(async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const isBlocked = await userHandle(id, dbRepositoryUser);
+    res.json({
+      status: "success",
+      isBlocked,
+    });
+  });
   return {
     getUserById,
+    getAllUsers,
     updateProfile,
     searchUser,
     putFollowUser,
     putUnFollowUser,
     getUserFriends,
     getUserFollowing,
+    handleUser
   };
 };
 export default userController;

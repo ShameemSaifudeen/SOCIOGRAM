@@ -42,7 +42,7 @@ const PostsWidget = ({ userId, isProfile = false }) => {
         <p>No posts to show</p>
       ) : (
         posts.map(
-          ({ _id, userId, userName, description, image, likes, comments, createdAt }) => (
+          ({ _id, userId, userName, description, image, likes, comments,report, createdAt }) => (
             <PostWidget
               key={_id}
               postId={_id}
@@ -53,6 +53,7 @@ const PostsWidget = ({ userId, isProfile = false }) => {
               image={image}
               likes={likes}
               comments={comments}
+              report={report}
               buttonlicked={buttonlicked}
               isProfile={isProfile ? isProfile : false}
             />

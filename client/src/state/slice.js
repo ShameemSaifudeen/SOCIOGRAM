@@ -4,12 +4,14 @@ const initialState = {
     mode: "light",
     user: null,
     token: null,
+    adminToken: null,
+    admin: null,
     posts: [],
     followers: [],
     following: [],
     friendFollowers: [],
     friendFollowing: [],
-    chatUsers:[]
+    chatUsers: []
 
 };
 
@@ -25,6 +27,11 @@ export const authSlice = createSlice({
             state.token = action.payload.token.token;
             state.user = action.payload.token.user;
         },
+        setAdminLogin: (state, action) => {
+
+            state.adminToken = action.payload.token.token;
+            state.admin = action.payload.token.admin;
+        },
         setUpdate: (state, action) => {
             state.user = action.payload;
             state.user.following = state.following
@@ -35,6 +42,10 @@ export const authSlice = createSlice({
             state.token = null;
             state.followers = [];
             state.following = [];
+        },
+        setAdminLogout: (state) => {
+            state.admin = null;
+            state.adminToken = null;
         },
         setPosts: (state, action) => {
             state.posts = action.payload.posts;
@@ -63,7 +74,7 @@ export const authSlice = createSlice({
         },
         setUpdateFriendFollowers: (state, action) => {
             // state.friendFollowers = action.payload?.followers;
-            console.log(state.friendFollowers,"><><><<>");
+            console.log(state.friendFollowers, "><><><<>");
         },
         setFriendFollowing: (state, action) => {
             state.friendFollowing = action.payload?.following;
@@ -81,11 +92,11 @@ export const authSlice = createSlice({
             state.posts = state.posts.filter((post) => post._id !== postId);
         },
         setChatUsers: (state, action) => {
-            state.chatUsers=action.payload.user
+            state.chatUsers = action.payload.user
         }
 
     },
 });
 
-export const { setMode, setLogin, setLogout, setPosts, setPost, setUpdatePost, setFollowers,setUpdateFriendFollowers, setFollowing, setUpdate, deleteUpdate, setFriendFollowers, setFriendFollowing,setChatUsers } = authSlice.actions;
+export const { setMode, setLogin, setLogout, setPosts, setPost, setUpdatePost, setFollowers, setUpdateFriendFollowers, setFollowing, setUpdate, deleteUpdate, setFriendFollowers, setFriendFollowing, setChatUsers, setAdminLogin, setAdminLogout } = authSlice.actions;
 export default authSlice.reducer;

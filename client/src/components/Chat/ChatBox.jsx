@@ -1,5 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRef } from "react";
 // import { addMessage, getMessages } from "../../api/MessageRequests";
 import { getUser } from "../../api/userApi/userApi";
@@ -12,8 +13,15 @@ import {
   getMessages,
 } from "../../api/MessageRequest/MessageRequest";
 import UserImage from "../UserImage/UserImage";
+import { Box, Typography } from "@mui/material";
 
-const ChatBox = ({ chat, currentUser, setSendMessage, receivedMessage }) => {
+const ChatBox = ({
+  chat,
+  currentUser,
+  setSendMessage,
+  receivedMessage,
+  
+}) => {
   const [userData, setUserData] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
@@ -23,13 +31,10 @@ const ChatBox = ({ chat, currentUser, setSendMessage, receivedMessage }) => {
   };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    
-    
     if (receivedMessage !== null && receivedMessage.chatId === chat._id) {
-      
       setMessages([...messages, receivedMessage]);
     }
-  },[receivedMessage] );
+  }, [receivedMessage]);
 
   // fetching data for header
   useEffect(() => {
@@ -37,7 +42,7 @@ const ChatBox = ({ chat, currentUser, setSendMessage, receivedMessage }) => {
     const getUserData = async () => {
       try {
         const data = await getUser(userId, token);
-        
+
         setUserData(data);
       } catch (error) {
         console.log(error);
@@ -50,9 +55,8 @@ const ChatBox = ({ chat, currentUser, setSendMessage, receivedMessage }) => {
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        
         const data = await getMessages(token, chat._id);
-        
+
         setMessages(data.messages);
       } catch (error) {
         console.log(error);
@@ -62,9 +66,9 @@ const ChatBox = ({ chat, currentUser, setSendMessage, receivedMessage }) => {
     if (chat !== null) fetchMessages();
   }, [chat]);
   // Always scroll to last Message
-  useEffect(()=> {
+  useEffect(() => {
     scroll.current?.scrollIntoView({ behavior: "smooth" });
-  },[messages])
+  }, [messages]);
   // Send Message
   const handleSend = async (e) => {
     e.preventDefault();
@@ -83,14 +87,13 @@ const ChatBox = ({ chat, currentUser, setSendMessage, receivedMessage }) => {
     // send message to database
     try {
       const data = await addMessage(token, message);
-      
+
       setMessages([...messages, data.messages]);
       setNewMessage("");
     } catch {
       console.log("error");
     }
   };
-  
 
   // Receive Message from parent component
 
@@ -98,26 +101,22 @@ const ChatBox = ({ chat, currentUser, setSendMessage, receivedMessage }) => {
   const imageRef = useRef();
   return (
     <>
-      <div className='ChatBox-container' style={{height:"76vh"}}>
+      <div className='ChatBox-container' style={{ height:"70vh" }}>
         {chat ? (
           <>
             <div className='chat-header'>
               <div className='follower'>
-                <div>
+                <div
+                  style={{ display: "flex", justifyContent: "flex-start" }}
+                >
                   <UserImage image={userData?.displayPicture} size='55px' />
-                  {/* <img
-                    src={
-                      userData?.displayPicture
-                        ? `http://localhost:5000/uploads/${userData.displayPicture}`
-                        : "/assets/150-1503945_transparent-user-png-default-user-image-png-png (1).png"
-                    }
-                    alt='Profile'
-                    className='followerImage'
-                    style={{ width: "50px", height: "50px" }}
-                  /> */}
-                  <div className='name' style={{ fontSize: "0.8rem" }}>
-                    <span>{userData?.userName}</span>
-                  </div>
+                  <Box>
+                    <Typography variant='h5' fontWeight='500' sx={{padding: "1rem"}}>
+                      {userData?.userName}
+                    </Typography>
+                   
+                  </Box>
+                  <Box></Box>
                 </div>
                 <hr style={{ width: "85%", border: "0.1px solid #ececec" }} />
               </div>
@@ -140,13 +139,15 @@ const ChatBox = ({ chat, currentUser, setSendMessage, receivedMessage }) => {
               ))}
             </div>
             <div className='chat-sender'>
-              <div onClick={() => imageRef.current.click()}>+</div>
+              <div ></div>
               <InputEmoji value={newMessage} onChange={handleChange} />
-              <div  className={`send-button button ${
-                !newMessage.trim() ? "disabled" : ""
-              }`}
-              disabled={!newMessage.trim()}
-              onClick={handleSend}>
+              <div
+                className={`send-button button ${
+                  !newMessage.trim() ? "disabled" : ""
+                }`}
+                disabled={!newMessage.trim()}
+                onClick={handleSend}
+              >
                 Send
               </div>
             </div>{" "}

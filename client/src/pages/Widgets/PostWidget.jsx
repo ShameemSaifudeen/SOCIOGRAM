@@ -33,6 +33,7 @@ import {
   deleteComment,
   editPost,
   getLike,
+  reportPost,
 } from "../../api/postRequest/postRequest";
 import { useSelector, useDispatch } from "react-redux";
 import { setPost, deleteUpdate } from "../../state/slice";
@@ -48,6 +49,7 @@ const PostWidget = ({
   image,
   likes,
   comments,
+  report,
   buttonlicked,
   isProfile,
 }) => {
@@ -55,7 +57,10 @@ const PostWidget = ({
   const [isDeleteVisible, setIsDeleteVisible] = useState(false);
   const [isEditVisible, setIsEditVisible] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
+
   const [editDescription, setEditDescription] = useState(description);
+  const [reportReason, setReportReason] = useState("");
+  const [isReportVisible, setIsReportVisible] = useState(false);
   const [commentInput, setCommentInput] = useState("");
   const navigate = useNavigate();
   const loggedInUserId = useSelector((state) => state.user._id);
@@ -65,6 +70,7 @@ const PostWidget = ({
   const token = useSelector((state) => state.token);
   const { userName } = useSelector((state) => state.user);
   const loggedUserId = useSelector((state) => state.user._id);
+  const reported = report.some((report) => report.userId === loggedUserId);
   const { palette } = useTheme();
   const main = palette.neutral.main;
   const primary = palette.primary.main;
@@ -84,8 +90,8 @@ const PostWidget = ({
     dispatch(deleteUpdate(postId));
     setIsDeleteVisible(false);
   };
-  const handleDeleteComment = async (index,userId) => {
-    const result = await deleteComment(index,userId,postId,token)
+  const handleDeleteComment = async (index, userId) => {
+    const result = await deleteComment(index, userId, postId, token);
     dispatch(setPost({ post: result }));
   };
 
@@ -95,8 +101,20 @@ const PostWidget = ({
   };
 
   const handleReport = () => {
-    // Implement your report logic here
+    setIsReportVisible(true);
     setAnchorEl(null);
+  };
+
+  const handleReportCancel = () => {
+    setIsReportVisible(false);
+    setReportReason("");
+  };
+
+  const handleReportConfirm = async () => {
+    const result = await reportPost(loggedUserId, postId, reportReason, token);
+    dispatch(setPost({ post: result }));
+    setIsReportVisible(false);
+    setReportReason("");
   };
 
   const handleDeleteConfirm = () => {
@@ -118,7 +136,6 @@ const PostWidget = ({
   const open = Boolean(anchorEl);
 
   const handleSaveEdit = async () => {
-    console.log("Edited Description:", editDescription);
     const result = await editPost(postId, editDescription, token);
     dispatch(setPost({ post: result.editedPost }));
     setIsEditVisible(false);
@@ -126,10 +143,8 @@ const PostWidget = ({
 
   const handleAddComment = async () => {
     const comment = `${userName}: ${commentInput}`;
-    console.log(comment);
     const result = await commentAdd(loggedUserId, postId, comment, token);
     dispatch(setPost({ post: result }));
-    console.log("Added comment:", commentInput);
     setCommentInput("");
   };
 
@@ -256,7 +271,9 @@ const PostWidget = ({
               }}
             >
               <Box p={2}>
-                <Button onClick={handleReport}>Report</Button>
+                <Button onClick={handleReport} disabled={reported}>
+                  {reported?"Already Reported": "Report"}
+                </Button>
               </Box>
             </Popover>
           </div>
@@ -285,7 +302,7 @@ const PostWidget = ({
                   </Typography>
                   {(isCurrentUserPost || userId === loggedUserId) && (
                     <IconButton
-                      onClick={() => handleDeleteComment(index,userId)}
+                      onClick={() => handleDeleteComment(index, userId)}
                       size='small'
                     >
                       <DeleteOutlined />
@@ -306,7 +323,12 @@ const PostWidget = ({
               value={commentInput}
               onChange={(e) => setCommentInput(e.target.value)}
             />
-            <Button variant='contained' size='small' onClick={handleAddComment}  disabled={!commentInput.trim()}>
+            <Button
+              variant='contained'
+              size='small'
+              onClick={handleAddComment}
+              disabled={!commentInput.trim()}
+            >
               Post
             </Button>
           </Box>
@@ -342,6 +364,26 @@ const PostWidget = ({
           <Button onClick={() => setIsEditVisible(false)}>Cancel</Button>
           <Button onClick={handleSaveEdit} color='primary'>
             Save
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={isReportVisible} onClose={handleReportCancel}>
+        <DialogTitle>Report Post</DialogTitle>
+        <DialogContent>
+          <TextField
+            variant='outlined'
+            fullWidth
+            multiline
+            rows={4}
+            label='Reason for reporting'
+            value={reportReason}
+            onChange={(e) => setReportReason(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleReportCancel}>Cancel</Button>
+          <Button onClick={handleReportConfirm} color='error'>
+            Report
           </Button>
         </DialogActions>
       </Dialog>

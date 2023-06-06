@@ -1,10 +1,9 @@
 import express from "express";
 import authController from "../../../adapters/controllers/authControllers";
-// import { adminDbRepository } from "../../../application/repositories/adminDbRepository";
+import { adminDbRepository } from "../../../application/repositories/adminDbRepositoryInterface";
 import { userDbRepository } from "../../../application/repositories/userDbRepository";
 import {authServiceInterface} from "../../../application/services/authServiceInterface";
-// import { googleAuthServiceInterface } from "../../../application/services/googleAuthServiceInterface";
-// import { adminRepositoryMongoDB } from "../../database/mongoDb/repositories/adminRepositoryMongoDB";
+import { adminRepositoryMongoDB } from "../../database/Mongodb/repositories/adminRepository";
 import { userRepositoryMongoDB } from "../../database/Mongodb/repositories/userRepository";
 import { authService } from "../../services/authService";
 // import { googleAuthService } from "../../services/googleAuthService";
@@ -18,6 +17,8 @@ const authRouter=()=>{
     authService,
     userDbRepository,
     userRepositoryMongoDB,
+    adminDbRepository,
+    adminRepositoryMongoDB
     );
 
    
@@ -27,6 +28,8 @@ const authRouter=()=>{
     router.post('/login',controller.loginUser)
     
     router.post('/googleLogin',controller.googleLoginUser)
+
+    router.post('/adminLogin',controller.adminLogin)
   
 
     return router

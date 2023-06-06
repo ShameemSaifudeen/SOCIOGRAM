@@ -113,3 +113,17 @@ export const deleteComment = async (index,loggedUserId,postId,token) => {
     throw error;
   }
 };
+export const reportPost = async (loggedUserId,postId,reason,token) => {
+  try {
+    const response = await API.put(`api/post/${postId}/report`,{userId: loggedUserId,reason:reason} ,{
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = response.data.reportedPost;
+    console.log(data,"ZZZZ");
+    return data;
+  } catch (error) {
+    // Handle error
+    console.error("Error getting user posts:", error);
+    throw error;
+  }
+};

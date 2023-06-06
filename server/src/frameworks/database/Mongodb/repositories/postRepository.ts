@@ -74,6 +74,26 @@ export const postRepositoryImp = () => {
     }
   };
 
+  const reportPost = async (postId: string, userId: string, reason: string) => {
+    try {
+      const post: any = await Post.findById(postId);
+      const isReported = post.report.some(
+        (report: { userId: string; }) => report.userId === userId
+      );
+      if (isReported) {
+        return null;
+      }
+      const updatedPost = await Post.findByIdAndUpdate(
+        postId,
+        { $push: { report: { userId, reason } } },
+        { new: true }
+      );
+      return updatedPost;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  
   const addComment = async (postId:string, userId:string , comment:string) => {
     try {
       const updatedPost = await Post.findByIdAndUpdate(
@@ -113,6 +133,7 @@ export const postRepositoryImp = () => {
     likePost,
     unLikePost,
     editPost,
+    reportPost,
     addComment,
     deleteComment
   };

@@ -2,7 +2,8 @@
     background: rgba(255, 255, 255, 0.64);
     border-radius: 1rem;
     display: grid;
-    grid-template-rows: 14vh 60vh 13vh;
+    grid-template-rows:14vh 58vh 8vh;     
+    /* 14vh 60vh 13vh; */
   }
   
   .chat-header {
@@ -17,6 +18,7 @@
     gap: 0.5rem;
     padding: 1.5rem;
     overflow: scroll;
+    margin: 1.5rem 0 2.5rem 0;
   }
   
   .message {
@@ -78,7 +80,7 @@
   
   .chat-sender > div {
     height: 70%;
-    padding: 0px 15px 0px 15px;
+    /* padding: 0px 0 0px 15px; */
   }
   
   ::-webkit-scrollbar {
@@ -93,7 +95,7 @@
     background-color: #4285f4;
     color: white;
     border-radius: 0.5rem;
-    padding: 0.5rem 1rem;
+    padding: 1rem;
     cursor: pointer;
     transition: background-color 0.3s ease;
   }

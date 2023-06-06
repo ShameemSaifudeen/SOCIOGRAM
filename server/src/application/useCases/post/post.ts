@@ -83,6 +83,19 @@ export const postEdit = async (
   }
   return editPost;
 };
+export const postReport = async (
+  postId: string,
+  userId: string,
+  reason: string,
+  repository: ReturnType<postDbInterfaceType>
+) => {
+  const reportPost = await repository.reportPost(postId,userId,reason);
+
+  if (!reportPost) {
+    throw new AppError("Reported Already", HttpStatus.BAD_REQUEST);
+  }
+  return reportPost;
+};
 export const addComment = async (
   postId: string,
   userId: string,

@@ -16,6 +16,7 @@ const postRouter = () => {
   router.put('/:id/unlike',controller.UnLikePost)
   router.put("/:postId",controller.editPost)
   router.put("/:postId/comment",controller.commentPost)
+  router.put("/:postId/report",controller.reportPost)
   router.put("/:postId/commentDelete",controller.deleteComment)
 
   return router;

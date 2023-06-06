@@ -13,6 +13,16 @@ export const userById = async (
   }
   return user;
 };
+export const allUsers = async (
+  repository: ReturnType<UserDbInterface>
+) => {
+  const users = await repository.getAllUsers();
+
+  if (!users) {
+    throw new AppError("user not found", HttpStatus.UNAUTHORIZED);
+  }
+  return users;
+};
 export const profileUpdate = async (
   id: string,
   user: {
@@ -82,9 +92,15 @@ export const followingList = async (
   repository: ReturnType<UserDbInterface>
 ) => {
   const following = await repository.followingList(id);
-  // if(!followers){
-  //   // throw new AppError("No Followers",HttpStatus.FORBIDDEN)
-
-  // }
   return following;
+};
+export const userHandle = async (
+  id: string,
+  repository: ReturnType<UserDbInterface>
+) => {
+  const result = await repository.userHandle(id);
+  if (!result) {
+    throw new AppError("Cannot find User", HttpStatus.FORBIDDEN);
+  }
+  return result;
 };

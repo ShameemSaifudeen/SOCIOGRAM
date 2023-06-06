@@ -9,8 +9,8 @@ import chatRouter from "./chat";
 
 const routes = (app: Application) => {
   app.use("/api/auth", authRouter());
-  app.use("/api/user", userAuthMiddleware, userRouter());
-  app.use("/api/post", userAuthMiddleware, postRouter());
+  app.use("/api/user", userRouter());
+  app.use("/api/post", postRouter());
   app.use("/api/chat", chatRouter());
   app.use("/api/message", messageRouter());
 };

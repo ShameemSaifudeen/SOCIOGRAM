@@ -3,7 +3,7 @@ import asyncHandler from "express-async-handler";
 import { resolve } from "path";
 import { postRepositoryType } from "../../frameworks/database/Mongodb/repositories/postRepository";
 import { postDbInterfaceType } from "../../application/repositories/postDbRepositoryInterface";
-import { postCreate ,getAllPosts, getUserPosts, postDelete, postLike, postUnLike, postEdit, addComment, commentDelete} from "../../application/useCases/post/post";
+import { postCreate ,getAllPosts, getUserPosts, postDelete, postLike, postUnLike, postEdit, addComment, commentDelete, postReport} from "../../application/useCases/post/post";
 
 const postController = (
   postDbInterface: postDbInterfaceType,
@@ -75,6 +75,16 @@ const postController = (
       editedPost
     })
   })
+  const reportPost = asyncHandler( async (req: Request, res: Response) => {
+    const{postId} = req.params
+    const {userId,reason} = req.body
+    const reportedPost = await postReport(postId,userId,reason,dbRepositoryPost)
+    res.json({
+      status: "success",
+      message: "Successfully reportedPost",
+      reportedPost
+    })
+  })
   const commentPost = asyncHandler( async (req: Request, res: Response) => {
     const{postId} = req.params
     const {userId,comment} = req.body
@@ -104,6 +114,7 @@ const postController = (
     UnLikePost,
     editPost,
     commentPost,
+    reportPost,
     deleteComment
   };
 };

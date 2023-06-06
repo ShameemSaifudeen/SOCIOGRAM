@@ -2,6 +2,7 @@ import { log } from "console";
 import { HttpStatus } from "../../../types/httpStatus";
 import AppError from "../../../utils/appError";
 import { UserDbInterface } from "../../repositories/userDbRepository";
+import { AdminDbInterface } from "../../repositories/adminDbRepositoryInterface";
 import { AuthServiceInterface } from "../../services/authServiceInterface";
 
 export const userRegister = async (
@@ -63,6 +64,29 @@ export const userLogin = async (
   }
   const token = authService.generateToken(user._id.toString());
   return { token, user };
+};
+export const adminlogin = async (
+  userName: string,
+  password: string,
+  adminRepository: ReturnType<AdminDbInterface>,
+  authService: ReturnType<AuthServiceInterface>
+) => {
+  const admin: any = await adminRepository.getAdminByUserName(userName);
+  if (!admin) {
+    throw new AppError("This admin does not exist", HttpStatus.UNAUTHORIZED);
+  }
+  const isPasswordCorrect = await authService.comparePassword(
+    password,
+    admin.password
+  );
+  if (!isPasswordCorrect) {
+    throw new AppError(
+      "Sorry, your password was incorrect. Please check your password",
+      HttpStatus.UNAUTHORIZED
+    );
+  }
+  const token = authService.generateToken(admin._id.toString());
+  return { token, admin };
 };
 export const googleLogin = async (
   userName: string,
