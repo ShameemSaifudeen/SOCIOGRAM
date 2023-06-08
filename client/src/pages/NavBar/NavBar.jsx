@@ -242,7 +242,7 @@ const Navbar = () => {
                   </Tooltip>
                 )}
               </IconButton>
-              <IconButton sx={{ fontSize: "30px" }}>
+              <IconButton sx={{ fontSize: "30px" }} onClick={() => navigate("/chat")}>
                 <Tooltip title='Chat' placement='bottom'>
                   <Message />
                 </Tooltip>

@@ -2,11 +2,9 @@ import API from "../instance";
 
 export const userChats = async (token, id) => {
   try {
-    console.log(id,"L");
     const response = await API.get(`/api/chat/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    console.log(response);
     return response.data;
   } catch (error) {
     // Handle error
@@ -16,14 +14,12 @@ export const userChats = async (token, id) => {
 };
 export const addChat = async (senderId,recieverId,token) => {
   try {
-    console.log(senderId,recieverId,"L");
     const response = await API.post(`/api/chat/`, {
       senderId: senderId,
       recieverId: recieverId,
     },{
       headers: { Authorization: `Bearer ${token}` },
     });
-    console.log(response);
     return response.data;
   } catch (error) {
     // Handle error

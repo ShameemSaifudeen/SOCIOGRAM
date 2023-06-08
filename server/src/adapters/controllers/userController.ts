@@ -29,7 +29,6 @@ const userController = (
     });
   });
   const getAllUsers = asyncHandler(async (req: Request, res: Response) => {
-    console.log("LL");
     
     const users = await allUsers(dbRepositoryUser);
     res.json({

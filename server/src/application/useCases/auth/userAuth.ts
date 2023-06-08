@@ -62,6 +62,12 @@ export const userLogin = async (
       HttpStatus.UNAUTHORIZED
     );
   }
+  if (user.isBlocked) {
+    throw new AppError(
+      "Sorry, your account is blocked by admin",
+      HttpStatus.UNAUTHORIZED
+    );
+  }
   const token = authService.generateToken(user._id.toString());
   return { token, user };
 };
@@ -101,6 +107,12 @@ export const googleLogin = async (
     email,
   };
   const isUserExist = await userRepository.getUserByEmail(email);
+  if (isUserExist.isBlocked) {
+    throw new AppError(
+      "Sorry, your account is blocked by admin",
+      HttpStatus.UNAUTHORIZED
+    );
+  }
   if (isUserExist) {
     const token = authService.generateToken(isUserExist._id.toString());
     return { token, user: isUserExist };

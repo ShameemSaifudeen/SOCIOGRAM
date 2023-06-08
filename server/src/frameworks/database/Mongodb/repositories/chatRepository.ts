@@ -9,7 +9,6 @@ export const chatRepositoryImp = () => {
       });
 
       if (existingChat) {
-        console.log("Chat already exists");
         return existingChat;
       }
 
@@ -18,7 +17,6 @@ export const chatRepositoryImp = () => {
       });
 
       const savedChat = await newChat.save();
-      console.log("New chat created");
 
       return savedChat;
     } catch (error) {

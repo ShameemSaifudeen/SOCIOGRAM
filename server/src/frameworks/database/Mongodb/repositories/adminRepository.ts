@@ -6,7 +6,6 @@ export const adminRepositoryMongoDB = () => {
  
   const getAdminByUserName = async (userName: string) => {
     const admin: any = await Admin.findOne({ userName });
-    console.log(admin);
     
     return admin;
   };

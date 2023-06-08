@@ -112,7 +112,7 @@ const Auth = () => {
   };
 const handleGoogleLogin = async()=>{
  await signInWithPopup(auth,provider).then(async (UserCredentials)=>{
-  const result = await googleLogin(UserCredentials.user);
+  const result = await googleLogin(UserCredentials.user,handleToast);
   if (result.status === "success") {
     dispatch(setLogin(result));
     navigate("../home", { replace: true });

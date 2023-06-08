@@ -60,8 +60,7 @@ const authController = (
   const adminLogin = asyncHandler(async (req: Request, res: Response) => {
     const { userName, password }: { userName: string; password: string } =
       req.body;
-      console.log(userName,":::");
-      
+    
     const token = await adminlogin(
       userName,
       password,
@@ -75,7 +74,6 @@ const authController = (
     });
   });
   const googleLoginUser = asyncHandler(async (req: Request, res: Response) => {
-    console.log(req.body);
     
     // const firstName = req.body?.displayName.split(" ")[0];
     const userName: string = req.body?.displayName;

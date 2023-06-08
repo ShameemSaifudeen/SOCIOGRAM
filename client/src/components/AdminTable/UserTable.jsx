@@ -19,7 +19,6 @@ const UserTable = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage] = useState(10);
 const handleUser = async(userId) => {
-  console.log(userId);
   const user = await userHandle(userId,token)
   const updatedUsers = users.map((user) => {
     if (user._id === userId) {

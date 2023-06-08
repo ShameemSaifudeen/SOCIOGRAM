@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -12,7 +13,7 @@ import FlexBetween from "../../components/FlexBetween/FlexBetween";
 import { setUpdatePost } from "../../state/slice";
 import { createPost } from "../../api/postRequest/postRequest";
 
-const MyPostWidget = ({ picturePath }) => {
+const MyPostWidget = ({ picturePath,handleClick }) => {
   const dispatch = useDispatch();
   const [isImage, setIsImage] = useState(false);
   const [image, setImage] = useState(null);
@@ -22,7 +23,6 @@ const MyPostWidget = ({ picturePath }) => {
   const token = useSelector((state) => state.token);
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
   const navigate = useNavigate();
-
   const handlePost = async () => {
     if (isImage && !image) {
       toast.error("Please select an image");
@@ -45,7 +45,8 @@ const MyPostWidget = ({ picturePath }) => {
       setImage(null);
       setPost("");
       setIsImage(false);
-      // navigate(0);
+      handleClick()
+      navigate(0);
     } catch (error) {
       console.error("Error creating post:", error);
       toast.error("An error occurred while creating the post");

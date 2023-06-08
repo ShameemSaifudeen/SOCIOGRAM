@@ -58,7 +58,6 @@ const Chat = () => {
   useEffect(() => {
     const getChats = async () => {
       try {
-        console.log(user._id);
         const data = await userChats(token, user._id);
         setChats(data.chats);
       } catch (error) {

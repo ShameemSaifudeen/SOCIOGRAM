@@ -20,7 +20,6 @@ export const editPost = async (postId, formData, token) => {
       headers: { Authorization: `Bearer ${token}` },
       "Content-Type": "multipart/form-data",
     });
-console.log(response.data,":::::::::::");
     return response.data;
   } catch (error) {
     // Handle error
@@ -119,7 +118,6 @@ export const reportPost = async (loggedUserId,postId,reason,token) => {
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = response.data.reportedPost;
-    console.log(data,"ZZZZ");
     return data;
   } catch (error) {
     // Handle error

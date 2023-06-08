@@ -6,11 +6,19 @@ import MyPostWidget from "../Widgets/MyPost";
 import PostsWidget from "../Widgets/PostsWidget";
 // import AdvertWidget from "scenes/widgets/AdvertWidget";
 import FriendListWidget from "../Widgets/FriendList";
+import { useEffect } from "react";
+import { useState } from "react";
 
 const HomePage = () => {
   const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
   const { _id, displayPicture } = useSelector((state) => state.user);
+  const [click,setClick] = useState(false)
+  const handleClick = () =>{
+    setClick(!click)
+  }
+useEffect(()=>{
 
+},[click])
   return (
     <Box>
       <Navbar />
@@ -31,7 +39,7 @@ const HomePage = () => {
           mt={isNonMobileScreens ? undefined : "2rem"}
           
         >
-          <MyPostWidget picturePath={displayPicture} />
+          <MyPostWidget picturePath={displayPicture} handleClick={handleClick} />
           <PostsWidget userId={_id} />
         </Box>
         {isNonMobileScreens && (

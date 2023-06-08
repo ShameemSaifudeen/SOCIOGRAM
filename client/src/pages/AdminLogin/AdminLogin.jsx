@@ -11,16 +11,12 @@ import { useFormik } from "formik";
 import * as yup from "yup";
 import useStyles from "./styles";
 import Input from "./Input";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useDispatch } from "react-redux";
 import { setAdminLogin } from "../../state/slice";
 import { adminLogin } from "../../api/AdminRequest/AdminRequest";
-// import { register, login } from "../../api/AuthRequest/AuthRequest";
-// import { googleLogin } from "../../api/AuthRequest/AuthRequest";
-// import { signInWithPopup } from "firebase/auth";
-// import { auth,provider } from "../../api/FireBaseConfig/FireBaseConfIg";
 const AdminLogin = () => {
   let classes = useStyles();
   const [showPassword, setShowPassword] = useState(false);

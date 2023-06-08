@@ -57,7 +57,6 @@ const UserWidget = ({ userId, userData, isProfile = false, handleEffect }) => {
     getFriends();
   }, [userId, isFollowing]);
   const handleFollow = async () => {
-    console.log(handleEffect, "1");
     const response = await followReq(user._id, userData._id, token);
 
     dispatch(setFollowers({ followers: response.followers }));
@@ -68,11 +67,9 @@ const UserWidget = ({ userId, userData, isProfile = false, handleEffect }) => {
 
   const handleMessage = async () => {
     const chat = await addChat(user._id,userData._id,token)
-    console.log(chat,"Message button clicked");
     if(chat){
       navigate("/chat")
     }
-    // Implement your logic for handling the message button click here
   };
 
   return (

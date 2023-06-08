@@ -8,7 +8,7 @@ const userAuthMiddleware = (
   res: Response,
   next: NextFunction
 ) => {
-  let token: string | null = "";
+  let token: string | null = ""; 
   if (
     req.headers.authorization &&
     req.headers.authorization.startsWith("Bearer")

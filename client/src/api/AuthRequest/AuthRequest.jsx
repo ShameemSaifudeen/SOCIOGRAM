@@ -24,7 +24,7 @@ export const login = async (formData, onSubmitProps, handleToast) => {
     throw error;
   }
 };
-export const googleLogin = async (formData) => {
+export const googleLogin = async (formData,handleToast) => {
   try {
     const response = await API.post("/api/auth/googleLogin", formData);
     return response.data;
