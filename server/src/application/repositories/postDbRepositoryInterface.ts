@@ -4,12 +4,14 @@ export const postDbInterface = (repository:ReturnType<postRepositoryType>) => {
     const createPost =   async (post:{
         userId: string;
         description: string;
-        image: string;
+        image: string[] ;
         userName: string;
     })=> await repository.createPost(post)
 
     const getAllPost = async () => await repository.getAllPost()
     const getUserPosts = async (id: string) => await repository.getUserPosts(id)
+    const getSinglePost = async (id: string) => await repository.getSinglePost(id)
+    const getUserTimelinePosts = async (id: string,followers: any) => await repository.getUserTimelinePosts(id,followers)
     const deletePost = async (id: string) => await repository.deletePost(id) 
     const likePost = async (id: string, loggedId: string) => await repository.likePost(id, loggedId)
     const unLikePost = async (id: string, loggedId: string) => await repository.unLikePost(id, loggedId)
@@ -22,6 +24,8 @@ export const postDbInterface = (repository:ReturnType<postRepositoryType>) => {
         createPost,
         getAllPost,
         getUserPosts,
+        getSinglePost,
+        getUserTimelinePosts,
         deletePost,
         likePost,
         unLikePost,

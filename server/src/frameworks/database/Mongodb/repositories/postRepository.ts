@@ -5,9 +5,11 @@ export const postRepositoryImp = () => {
   const createPost = async (post: {
     userId: string;
     description: string;
-    image: string;
+    image: string[] ;
     userName: string;
   }) => {
+    
+    
     const newPost = await new Post(post);
 
     return await newPost.save();
@@ -17,6 +19,12 @@ export const postRepositoryImp = () => {
   };
   const getUserPosts = async (id: string) => {
     return await Post.find({ userId: id }).sort({ createdAt: -1 });
+  };
+  const getSinglePost = async (id: string) => {
+    return await Post.findById(id);
+  };
+  const getUserTimelinePosts = async (id: string,followers:any) => {
+    return await Post.find({ userId: { $in: followers } }).sort({ createdAt: -1 });
   };
   const deletePost = async (id: string) => {
     const postDeleted: any = await Post.findByIdAndDelete({ _id: id });
@@ -129,13 +137,15 @@ export const postRepositoryImp = () => {
     createPost,
     getAllPost,
     getUserPosts,
+    getSinglePost,
     deletePost,
     likePost,
     unLikePost,
     editPost,
     reportPost,
     addComment,
-    deleteComment
+    deleteComment,
+    getUserTimelinePosts
   };
 };
 

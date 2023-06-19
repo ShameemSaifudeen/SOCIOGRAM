@@ -3,23 +3,39 @@ import asyncHandler from "express-async-handler";
 import { resolve } from "path";
 import { postRepositoryType } from "../../frameworks/database/Mongodb/repositories/postRepository";
 import { postDbInterfaceType } from "../../application/repositories/postDbRepositoryInterface";
-import { postCreate ,getAllPosts, getUserPosts, postDelete, postLike, postUnLike, postEdit, addComment, commentDelete, postReport} from "../../application/useCases/post/post";
+import { postCreate ,getAllPosts, getUserPosts, postDelete, postLike, postUnLike, postEdit, addComment, commentDelete, postReport, getUserDisplayPosts, singlePost} from "../../application/useCases/post/post";
+import { UserDbInterface } from "../../application/repositories/userDbRepository";
+import { UserRepositoryMongoDB } from "../../frameworks/database/Mongodb/repositories/userRepository";
 
 const postController = (
   postDbInterface: postDbInterfaceType,
-  postDbImp: postRepositoryType
+  postDbImp: postRepositoryType,
+  userDbRepository: UserDbInterface,
+  userDbRepositoryImpl: UserRepositoryMongoDB
 ) => {
   const dbRepositoryPost = postDbInterface(postDbImp());
+  const dbRepositoryUser = userDbRepository(userDbRepositoryImpl());
   const createPost = asyncHandler(async (req: Request, res: Response) => {
-    const image : any = req.file?.filename
-    const { userId, description,userName } = req.body;   
-    const post = { userId, description, image ,userName};
+    
+    const image: string[] = [];
+    const { userId, description, userName } = req.body;
+  const files: any = req?.files
+    for (const file of files) {
+      const picture = file.filename;
+      image.push(picture);
+    }
+    
+  
+    const post = { userId, description, image, userName };
+
     const newPost = await postCreate(post, dbRepositoryPost);
+  
     res.json({
       status: "success",
       newPost,
     });
   });
+  
   const getPosts = asyncHandler ( async (req:Request, res: Response) => {
     const posts = await getAllPosts(dbRepositoryPost)
     res.json({
@@ -30,6 +46,24 @@ const postController = (
   const getUserPost = asyncHandler ( async (req:Request, res: Response) => {
     const {userId} = req.params
     const posts = await getUserPosts(userId, dbRepositoryPost)
+    res.json({
+      status : "success",
+      posts
+    })
+  })
+  const getSinglePost = asyncHandler ( async (req:Request, res: Response) => {
+    const {id} = req.params
+    console.log(id,":::::");
+    
+    const posts = await singlePost(id, dbRepositoryPost)
+    res.json({
+      status : "success",
+      posts
+    })
+  })
+  const getDisplayPost = asyncHandler ( async (req:Request, res: Response) => {
+    const {userId} = req.params
+    const posts = await getUserDisplayPosts(userId, dbRepositoryPost,dbRepositoryUser)
     res.json({
       status : "success",
       posts
@@ -109,13 +143,15 @@ const postController = (
     createPost,
     getPosts,
     getUserPost,
+    getSinglePost,
     deletePost,
     likePost,
     UnLikePost,
     editPost,
     commentPost,
     reportPost,
-    deleteComment
+    deleteComment,
+    getDisplayPost
   };
 };
 export default postController;

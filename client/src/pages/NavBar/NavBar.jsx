@@ -1,4 +1,5 @@
-import { useState } from "react";
+/* eslint-disable react/prop-types */
+import { useEffect, useState } from "react";
 import {
   Box,
   IconButton,
@@ -11,6 +12,9 @@ import {
   useMediaQuery,
   Tooltip,
   CircularProgress,
+  Popover,
+  Button,
+  Badge,
 } from "@mui/material";
 import {
   Search,
@@ -29,7 +33,9 @@ import FlexBetween from "../../components/FlexBetween/FlexBetween";
 import debounce from "lodash.debounce";
 import { userSearch } from "../../api/userApi/userApi";
 
-const Navbar = () => {
+const Navbar = ({ socket }) => {
+  const [notificationAnchorEl, setNotificationAnchorEl] = useState(null);
+
   const [isMobileMenuToggled, setIsMobileMenuToggled] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -45,6 +51,43 @@ const Navbar = () => {
   const background = theme.palette.background.default;
   const primaryLight = theme.palette.primary.light;
   const alt = theme.palette.background.alt;
+  const [notifications, setNotifications] = useState([]);
+  const openNotificationPopover = (event) => {
+    setNotificationAnchorEl(event.currentTarget);
+  };
+
+  const closeNotificationPopover = () => {
+    setNotificationAnchorEl(null);
+  };
+
+  const isNotificationPopoverOpen = Boolean(notificationAnchorEl);
+  const displayNotification = ({ senderName, type }) => {
+    let action;
+
+    if (type === "liked") {
+      action = "liked";
+    } else if (type === "commented") {
+      action = "commented";
+    } else {
+      action = "shared";
+    }
+    return (
+      <span className='notification'>{`${senderName} ${action} on your post.`}</span>
+    );
+  };
+
+  useEffect(() => {
+    socket?.on("getNotifications", (data) => {
+      const isDuplicate = notifications.some(
+        (item) => item.postId === data.postId
+      );
+
+      if (!isDuplicate) {
+        setNotifications((prev) => [...prev, data]); // Update notifications state with the received data
+      } // Update notifications state with the received data
+    });
+  }, [socket]);
+  const hasUnreadNotifications = notifications.length > 0;
   const handleUser = (userId) => {
     setLoading(true);
     setSuggestions([]);
@@ -141,6 +184,79 @@ const Navbar = () => {
           )}
         </FlexBetween>
 
+        {/* NOTIFICATION POPOVER */}
+        <Popover
+          open={isNotificationPopoverOpen}
+          anchorEl={notificationAnchorEl}
+          onClose={closeNotificationPopover}
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "right",
+          }}
+          transformOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
+        >
+          <Box sx={{ p: "1rem" }}>
+            {notifications.length === 0 ? (
+              <Typography>No notifications</Typography>
+            ) : (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "flex-start",
+                }}
+              >
+                {notifications.map((notification, index) => {
+                  if (index % 2 === 1) {
+                    // Skip odd indexes
+                    return null;
+                  }
+
+                  return (
+                    <Typography
+                      key={notification.id}
+                      style={{ marginBottom: "0.5rem" }}
+                    >
+                      {displayNotification(notification)}
+                    </Typography>
+                  );
+                })}
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    alignItems: "center",
+                    marginTop: "1rem",
+                  }}
+                >
+                  <Typography
+                    variant='body2'
+                    sx={{ marginRight: "0.5rem", color: "gray" }}
+                  >
+                    {(notifications.length)/2} unread notifications
+                  </Typography>
+                  <Button
+                    variant='contained'
+                    onClick={() => setNotifications([])}
+                    sx={{
+                      backgroundColor: "#00D5FA",
+                      color: "#fff",
+                      "&:hover": {
+                        backgroundColor: "#00353F",
+                      },
+                    }}
+                  >
+                    Clear Notifications
+                  </Button>
+                </div>
+              </div>
+            )}
+          </Box>
+        </Popover>
+
         {/* DESKTOP NAV */}
         {isNonMobileScreens ? (
           <FlexBetween gap='2rem'>
@@ -156,10 +272,25 @@ const Navbar = () => {
               )}
             </IconButton>
             <Tooltip title='Chat' placement='bottom'>
-              <Message sx={{ fontSize: "25px" }} onClick={() => navigate("/chat")}/>
+              <Message
+                sx={{ fontSize: "25px" }}
+                onClick={() => {navigate("/chat") ;
+                navigate(0)}}
+              />
             </Tooltip>
             <Tooltip title='Notification' placement='bottom'>
-              <Notifications sx={{ fontSize: "25px" }} />
+              <IconButton
+                sx={{ fontSize: "25px" }}
+                onClick={openNotificationPopover}
+              >
+                {hasUnreadNotifications ? (
+                  <Badge badgeContent={(notifications.length)/2} color='error'>
+                    <Notifications sx={{ fontSize: "25px" }}/>
+                  </Badge>
+                ) : (
+                  <Notifications sx={{ fontSize: "25px" }}/>
+                )}
+              </IconButton>
             </Tooltip>
             <Tooltip title='Help' placement='bottom'>
               <Help sx={{ fontSize: "25px" }} />
@@ -242,7 +373,11 @@ const Navbar = () => {
                   </Tooltip>
                 )}
               </IconButton>
-              <IconButton sx={{ fontSize: "30px" }} onClick={() => navigate("/chat")}>
+              <IconButton
+                sx={{ fontSize: "30px" }}
+                onClick={() => {navigate("/chat") ;
+                navigate(0)}}
+              >
                 <Tooltip title='Chat' placement='bottom'>
                   <Message />
                 </Tooltip>

@@ -30,27 +30,24 @@ const Chat = () => {
     socket.current = io("ws://localhost:5000");
     socket.current.emit("new-user-add", user._id);
     socket.current.on("get-users", (users) => {
-      
       setOnlineUsers(users);
     });
-  
-    socket.current.on("receive-message", (data) => {
 
+    socket.current.on("receive-message", (data) => {
       setReceiveMessage(data);
     });
-  
+
     return () => {
       if (socket.current) {
         socket.current.disconnect();
       }
     };
-  }, [user,receiveMessage]);
+  }, [user, receiveMessage]);
   useEffect(() => {
     if (sendMessage !== null) {
       socket.current.emit("send-message", sendMessage);
     }
   }, [sendMessage]);
- 
 
   // Get the message from socket server
 
@@ -82,7 +79,6 @@ const Chat = () => {
 
         {/* Left Side */}
         <div className='Left-side-chat'>
-        
           <div className='Chat-container'>
             <h2>Chats</h2>
             <div className='Chat-list'>
@@ -93,7 +89,11 @@ const Chat = () => {
                     setCurrentChat(chat);
                   }}
                 >
-                  <Conversation data={chat} currentUserId={user._id} online={checkOnlineStatus(chat)} />
+                  <Conversation
+                    data={chat}
+                    currentUserId={user._id}
+                    online={checkOnlineStatus(chat)}
+                  />
                 </div>
               ))}
             </div>
@@ -103,8 +103,6 @@ const Chat = () => {
         {/* Right Side */}
 
         <div className='Right-side-chat'>
-         
-
           <ChatBox
             chat={currentChat}
             currentUser={user._id}

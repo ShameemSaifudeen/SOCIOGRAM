@@ -13,7 +13,7 @@ import { useSelector,useDispatch } from "react-redux";
 import { setUpdate } from "../../state/slice";
 
 
-const AccountEditModal = ({ open, onClose, userData }) => {
+const AccountEditModal = ({ open, onClose, userData,handleClick }) => {
   const dispatch = useDispatch()
   const validationSchema = Yup.object().shape({
     userName: Yup.string().required("Username is required"),
@@ -31,7 +31,7 @@ const AccountEditModal = ({ open, onClose, userData }) => {
       number: userData.number,
       email: userData.email,
       location: userData.location,
-      bio: "",
+      bio: userData.bio,
       picture: null,
     },
     validationSchema,
@@ -47,6 +47,9 @@ const AccountEditModal = ({ open, onClose, userData }) => {
         try {
           const updated = await updateProfile(userData._id,token,formData )
           dispatch(setUpdate(updated))
+          if(handleClick){
+            handleClick()
+          }
           onClose();
         } catch (error) {
           // Handle the error

@@ -1,6 +1,6 @@
 import "./App.css";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { createTheme } from "@mui/material/styles";
@@ -11,6 +11,8 @@ import ProfilePage from "./pages/Profile/Profile";
 import ChatPage from "./pages/Chat/Chat";
 import AdminLogin from "./pages/AdminLogin/AdminLogin";
 import AdminHome from "./pages/AdminHome/AdminHome";
+import CallPage from "./pages/Call/Call";
+
 function App() {
   const mode = useSelector((state) => state.mode);
   const theme = useMemo(() => createTheme(themeSettings(mode)), [mode]);
@@ -42,7 +44,11 @@ function App() {
             <Route
               path='/chat/'
               element={token ? <ChatPage /> : <Navigate to='/' />}
-            />
+            /> 
+             <Route
+            path='/room/:roomId'
+            element={token ? <CallPage /> : <Navigate to='/' />}
+          />
             <Route
               path='/admin'
               element={

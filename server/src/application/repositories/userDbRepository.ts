@@ -33,6 +33,8 @@ export const userDbRepository = (
     await repository.getUserByUserName(userName);
   const followUser = async (id: string, friendId: string) =>
     await repository.followUser(id, friendId);
+  const getUserFollowing = async (id: string) =>
+    await repository.getUserFollowing(id);
   const unFollowUser = async (id: string, friendId: string) =>
     await repository.unFollowUser(id, friendId);
   const followersList = async (id: string) =>
@@ -42,6 +44,7 @@ export const userDbRepository = (
   const userHandle = async (id: string) =>
     await repository.userHandle(id);
   const userSearch = async (name: string) => await repository.userSearch(name);
+  const reportUser = async ( id: string,userId: string,reason: string) => await repository.reportUser(id,userId,reason)
 
   return {
     addUser,
@@ -55,7 +58,9 @@ export const userDbRepository = (
     unFollowUser,
     followersList,
     followingList,
-    userHandle
+    userHandle,
+    reportUser,
+    getUserFollowing
   };
 };
 export type UserDbInterface = typeof userDbRepository;

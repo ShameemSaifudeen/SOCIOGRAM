@@ -12,6 +12,7 @@ import {
   userSearch,
   allUsers,
   userHandle,
+  userReport,
 } from "../../application/useCases/user/user";
 import { UserRepositoryMongoDB } from "../../frameworks/database/Mongodb/repositories/userRepository";
 
@@ -118,6 +119,16 @@ const userController = (
       isBlocked,
     });
   });
+  const reportUser = asyncHandler( async (req: Request, res: Response) => {
+    const{id} = req.params
+    const {userId,reason} = req.body
+    const reportedUser = await userReport(id,userId,reason,dbRepositoryUser)
+    res.json({
+      status: "success",
+      message: "Successfully reportedPost",
+      reportedUser
+    })
+  })
   return {
     getUserById,
     getAllUsers,
@@ -127,7 +138,8 @@ const userController = (
     putUnFollowUser,
     getUserFriends,
     getUserFollowing,
-    handleUser
+    handleUser,
+    reportUser
   };
 };
 export default userController;

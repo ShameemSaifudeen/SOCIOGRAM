@@ -21,6 +21,9 @@ const userRouter = () => {
   router.get("/:id/followers",userAuthMiddleware, controller.getUserFriends);
   router.get("/:id/following",userAuthMiddleware, controller.getUserFollowing);
   router.put("/:id/userHandle", controller.handleUser);
+  router.put("/:id/report",userAuthMiddleware,controller.reportUser)
+
+  
 
   return router;
 };

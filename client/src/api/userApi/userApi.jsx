@@ -2,12 +2,13 @@ import API from "../instance";
 
 export const getUser = async (userId, token) => {
   try {
-    const response = await API.get(`api/user/${userId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await response.data.user
-
-    return data;
+    if (userId) {
+      const response = await API.get(`api/user/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.data.user;
+      return data;
+    }
   } catch (error) {
     // Handle error
     console.error("Error fetching user:", error);
@@ -16,9 +17,13 @@ export const getUser = async (userId, token) => {
 };
 export const followReq = async (id, friendId, token) => {
   try {
-    const response = await API.put(`api/user/${friendId}/follow`, {id:id}, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const response = await API.put(
+      `api/user/${friendId}/follow`,
+      { id: id },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
     const data = await response.data.result;
     return data;
   } catch (error) {
@@ -51,22 +56,25 @@ export const getFollowing = async (userId, token) => {
     throw error;
   }
 };
-export const updateProfile = async (userId,token,formData) => {
+export const updateProfile = async (userId, token, formData) => {
   try {
-    const response = await API.put(`api/user/${userId}/updateProfile`,formData, {
-      headers: { Authorization: `Bearer ${token}` },
-      
-    });
+    const response = await API.put(
+      `api/user/${userId}/updateProfile`,
+      formData,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
     const data = await response.data.updatedProfile;
     return data;
   } catch (error) {
     console.error("Error fetching user:", error);
     throw error;
   }
-}
-export const userSearch = async (name,token) => {
+};
+export const userSearch = async (name, token) => {
   try {
-    const response = await API.get(`api/user/search` , {
+    const response = await API.get(`api/user/search`, {
       params: { name },
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -76,4 +84,21 @@ export const userSearch = async (name,token) => {
     console.error("Error fetching user:", error);
     throw error;
   }
-}
+};
+export const reportUser = async (loggedUserId, id, reason, token) => {
+  try {
+    const response = await API.put(
+      `api/user/${id}/report`,
+      { userId: loggedUserId, reason: reason },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    const data = response.data.reportedUser;
+    return data;
+  } catch (error) {
+    // Handle error
+    console.error("Error getting user posts:", error);
+    throw error;
+  }
+};

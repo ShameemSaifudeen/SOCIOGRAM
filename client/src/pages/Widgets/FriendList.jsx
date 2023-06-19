@@ -12,7 +12,7 @@ import {
 } from "../../state/slice";
 
 // eslint-disable-next-line react/prop-types
-const FriendListWidget = ({ userId, isFollowingList = false, handleEffect }) => {
+const FriendListWidget = ({ userId, isFollowingList = false, handleEffect,handleClick }) => {
   const dispatch = useDispatch();
   const [click,setClick] = useState(false)
   const token = useSelector((state) => state.token);
@@ -89,6 +89,7 @@ const FriendListWidget = ({ userId, isFollowingList = false, handleEffect }) => 
               subtitle={friend.name}
               userPicturePath={friend.displayPicture}
               handleRequest={handleRequest}
+              handleClick={handleClick}
             />
           ))}
           {remainingFriends.length > 0 && !expanded && (
@@ -105,6 +106,7 @@ const FriendListWidget = ({ userId, isFollowingList = false, handleEffect }) => 
                 subtitle={friend?.name}
                 userPicturePath={friend?.displayPicture}
                 handleRequest={handleRequest}
+                handleClick={handleClick}
               />
             ))}
           </Collapse>

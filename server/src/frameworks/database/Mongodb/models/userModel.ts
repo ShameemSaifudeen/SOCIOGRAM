@@ -55,6 +55,7 @@ const userSchema = new Schema(
         ref: "User",
       },
     ],
+    report:[]
   },
   { timestamps: true }
 );

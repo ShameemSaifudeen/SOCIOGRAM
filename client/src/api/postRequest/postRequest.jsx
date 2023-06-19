@@ -14,6 +14,18 @@ export const createPost = async (token, formData) => {
     throw error;
   }
 };
+export const singlePost = async (token, postId) => {
+  try {
+    const response = await API.get(`api/post/singlePost/${postId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  } catch (error) {
+    // Handle error
+    console.error("Error creating post:", error);
+    throw error;
+  }
+};
 export const editPost = async (postId, formData, token) => {
   try {
     const response = await API.put(`api/post/${postId}`, {description:formData}, {
@@ -41,7 +53,19 @@ export const getPosts = async (token) => {
     throw error;
   }
 };
-
+export const getDisplayPosts = async (userId,token) => {
+  try {
+    const response = await API.get(`api/post/timeLinePost/${userId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = response.data;
+    return data;
+  } catch (error) {
+    // Handle error
+    console.error("Error getting posts:", error);
+    throw error;
+  }
+};
 export const getUserPosts = async (userId, token) => {
   try {
     const response = await API.get(`api/post/${userId}`, {

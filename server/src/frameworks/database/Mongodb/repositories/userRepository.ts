@@ -60,6 +60,25 @@ export const userRepositoryMongoDB = () => {
 
     return user;
   };
+  const reportUser = async (id: string, userId: string, reason: string) => {
+    try {
+      const user: any = await User.findById(id);
+      const isReported = user.report.some((report: { userId: string }) => report.userId === userId);
+      if (isReported) {
+        return null;
+      }
+      user.report.push({ userId, reason });
+      await user.save();
+      return user;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const getUserFollowing = async (id: string) => {
+    const user: any = await User.findById(id).select("following").exec();
+    const followingIds = user.following.map((following: any) => following.toString());
+    return followingIds;
+  };
   const updateProfile = async (
     id: string,
     user: {
@@ -208,7 +227,9 @@ export const userRepositoryMongoDB = () => {
     userSearch,
     followersList,
     followingList,
-    userHandle
+    userHandle,
+    reportUser,
+    getUserFollowing
   };
 };
 

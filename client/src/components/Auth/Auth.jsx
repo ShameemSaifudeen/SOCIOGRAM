@@ -80,7 +80,10 @@ const Auth = () => {
           .string()
           .email("Invalid email")
           .required("Email is required"),
-        password: yup.string().required("Password is required"),
+        password: yup.string().required("Password is required").matches(
+          /^[^\s].{2,}$/,
+          "Password must not start with a space and have at least 3 characters"
+        ),
         confirmPassword: yup
           .string()
           .oneOf([yup.ref("password")], "Passwords must match"),

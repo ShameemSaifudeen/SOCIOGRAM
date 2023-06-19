@@ -11,6 +11,8 @@ import {
   AddComment,
 } from "@mui/icons-material";
 import { format } from "timeago.js";
+import { Carousel } from "react-responsive-carousel";
+import "react-responsive-carousel/lib/styles/carousel.min.css";
 import {
   Box,
   Divider,
@@ -39,10 +41,11 @@ import { useSelector, useDispatch } from "react-redux";
 import { setPost, deleteUpdate } from "../../state/slice";
 import { deletePost } from "../../api/postRequest/postRequest";
 import { useNavigate } from "react-router-dom";
-
+const MAX_DESCRIPTION_LENGTH = 185;
 const PostWidget = ({
   postId,
   postUserId,
+  postUserName,
   postCreatedAt,
   name,
   description,
@@ -52,12 +55,12 @@ const PostWidget = ({
   report,
   buttonlicked,
   isProfile,
+  socket,
 }) => {
   const [isComments, setIsComments] = useState(false);
   const [isDeleteVisible, setIsDeleteVisible] = useState(false);
   const [isEditVisible, setIsEditVisible] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
-
   const [editDescription, setEditDescription] = useState(description);
   const [reportReason, setReportReason] = useState("");
   const [isReportVisible, setIsReportVisible] = useState(false);
@@ -78,11 +81,17 @@ const PostWidget = ({
   const likeCount = likes.length;
   const commentCount = comments.length;
   const postTime = format(postCreatedAt);
-
+const isProfilePost = useState(true)
   const handleLike = async () => {
     const result = await getLike(token, postId, loggedUserId);
     dispatch(setPost({ post: result.likedPost }));
     buttonlicked();
+    socket.emit("sendNotification", {
+      senderName: userName,
+      receiverId: postUserId,
+      postId: postId,
+      type: "liked",
+    });
   };
 
   const handleDelete = async () => {
@@ -133,6 +142,14 @@ const PostWidget = ({
     setAnchorEl(null);
   };
 
+  const isVideo = (fileName) => {
+    const videoExtensions = [".mp4", ".mov", ".avi", ".mkv"]; // Add more video extensions if needed
+    const extension = fileName
+      .substring(fileName.lastIndexOf("."))
+      .toLowerCase();
+    return videoExtensions.includes(extension);
+  };
+
   const open = Boolean(anchorEl);
 
   const handleSaveEdit = async () => {
@@ -146,8 +163,20 @@ const PostWidget = ({
     const result = await commentAdd(loggedUserId, postId, comment, token);
     dispatch(setPost({ post: result }));
     setCommentInput("");
+    socket.emit("sendNotification", {
+      senderName: userName,
+      receiverId: postUserId,
+      postId: postId,
+      type: "commented",
+    });
+  };
+  const [showMore, setShowMore] = useState(false);
+
+  const toggleShowMore = () => {
+    setShowMore(!showMore);
   };
 
+  const shortDescription = description.slice(0, MAX_DESCRIPTION_LENGTH);
   return (
     <WidgetWrapper m={isProfile ? "0rem 0 2rem 0" : "2rem 0"}>
       <Friend
@@ -155,18 +184,86 @@ const PostWidget = ({
         name={name}
         subtitle={postTime}
         userPicturePath=''
+        isProfilePost={isProfilePost}
       />
       <Typography color={main} sx={{ mt: "1rem" }}>
-        {description}
+        {showMore ? description : shortDescription}
       </Typography>
-      {picturePath && (
-        <img
-          width='100%'
-          height='auto'
-          alt='post'
-          style={{ borderRadius: "0.75rem", marginTop: "0.75rem" }}
-          src={`http://localhost:5000/uploads/${image}`}
-        />
+      {description.length > MAX_DESCRIPTION_LENGTH && (
+        <Button onClick={toggleShowMore}>
+          {showMore ? "Show Less" : "Show More"}
+        </Button>
+      )}
+      {image.length > 1 && (
+        <>
+          <Carousel
+            showThumbs={false}
+            autoPlay={true}
+            interval={3000}
+            infiniteLoop={true}
+          >
+            {image.map((imageName, index) => (
+              <React.Fragment key={index}>
+                {isVideo(imageName) ? (
+                  <video
+                    src={`http://localhost:5000/uploads/${imageName}`}
+                    controls
+                    style={{
+                      width: "100%",
+                      height: "auto",
+                      borderRadius: "0.75rem",
+                      marginTop: "0.75rem",
+                    }}
+                  />
+                ) : (
+                  <img
+                    src={`http://localhost:5000/uploads/${imageName}`}
+                    alt={`post-image-${index}`}
+                    style={{
+                      width: "100%",
+                      height: "auto",
+                      borderRadius: "0.75rem",
+                      marginTop: "0.75rem",
+                    }}
+                  />
+                )}
+              </React.Fragment>
+            ))}
+          </Carousel>
+        </>
+      )}
+
+      {image.length === 1 && (
+        <>
+          {isVideo(image[0]) ? (
+            <video
+              width='100%'
+              height='auto'
+              controls
+              style={{
+                borderRadius: "0.75rem",
+                marginTop: "0.75rem",
+              }}
+            >
+              <source
+                src={`http://localhost:5000/uploads/${image[0]}`}
+                type='video/mp4'
+              />
+              Your browser does not support the video tag.
+            </video>
+          ) : (
+            <img
+              width='100%'
+              height='auto'
+              alt='post'
+              style={{
+                borderRadius: "0.75rem",
+                marginTop: "0.75rem",
+              }}
+              src={`http://localhost:5000/uploads/${image[0]}`}
+            />
+          )}
+        </>
       )}
       <FlexBetween mt='0.25rem'>
         <FlexBetween gap='1rem'>
@@ -243,11 +340,43 @@ const PostWidget = ({
                 }}
               >
                 <Box p={2}>
-                  <Button onClick={handleReport}>Report</Button>
+                  <Button onClick={handleReport} disabled={reported}>
+                    {reported ? "Already Reported" : "Report"}
+                  </Button>
                 </Box>
               </Popover>
             </div>
           )
+        ) : isCurrentUserPost ? (
+          <div>
+            <IconButton
+              onClick={handlePopoverOpen}
+              aria-describedby='more-options'
+            >
+              <MoreHorizOutlined />
+            </IconButton>
+            <Popover
+              id='more-options'
+              open={open}
+              anchorEl={anchorEl}
+              onClose={handlePopoverClose}
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "right",
+              }}
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+            >
+              <Box p={2}>
+                <Button onClick={handleEdit}>Edit</Button>
+                <Button onClick={handleDeleteConfirm} color='error'>
+                  Delete
+                </Button>
+              </Box>
+            </Popover>
+          </div>
         ) : (
           <div>
             <IconButton
@@ -272,7 +401,7 @@ const PostWidget = ({
             >
               <Box p={2}>
                 <Button onClick={handleReport} disabled={reported}>
-                  {reported?"Already Reported": "Report"}
+                  {reported ? "Already Reported" : "Report"}
                 </Button>
               </Box>
             </Popover>

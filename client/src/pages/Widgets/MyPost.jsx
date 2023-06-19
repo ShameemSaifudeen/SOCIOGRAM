@@ -1,9 +1,29 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { Box, Divider, Typography, InputBase, useTheme, Button, IconButton, useMediaQuery } from "@mui/material";
-import { EditOutlined, DeleteOutlined, AttachFileOutlined, GifBoxOutlined, ImageOutlined, MicOutlined, MoreHorizOutlined } from "@mui/icons-material";
+import {
+  Box,
+  Divider,
+  Typography,
+  InputBase,
+  useTheme,
+  Button,
+  IconButton,
+  useMediaQuery,
+  CircularProgress
+} from "@mui/material";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  AttachFileOutlined,
+  GifBoxOutlined,
+  ImageOutlined,
+  MicOutlined,
+  MoreHorizOutlined,
+  VideocamOutlined,
+} from "@mui/icons-material";
 import Dropzone from "react-dropzone";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -13,18 +33,21 @@ import FlexBetween from "../../components/FlexBetween/FlexBetween";
 import { setUpdatePost } from "../../state/slice";
 import { createPost } from "../../api/postRequest/postRequest";
 
-const MyPostWidget = ({ picturePath,handleClick }) => {
+const MyPostWidget = ({ picturePath, handleClick }) => {
   const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(false);
   const [isImage, setIsImage] = useState(false);
-  const [image, setImage] = useState(null);
+  const [images, setImages] = useState([]);
   const [post, setPost] = useState("");
   const { palette } = useTheme();
   const { _id, userName } = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
   const navigate = useNavigate();
+
   const handlePost = async () => {
-    if (isImage && !image) {
+    if (images.length === 0) {
+      console.log("inside if");
       toast.error("Please select an image");
       return;
     }
@@ -33,37 +56,55 @@ const MyPostWidget = ({ picturePath,handleClick }) => {
     formData.append("userId", _id);
     formData.append("description", post);
 
-    if (image) {
-      formData.append("picture", image);
-      formData.append("image", image.name);
+    if (images.length > 0) {
+      images.forEach((selectedImage, index) => {
+        formData.append(`picture`, selectedImage);
+        formData.append(`image${index}`, selectedImage.name);
+      });
       formData.append("userName", userName);
     }
+    setIsLoading(true);
 
     try {
       const posts = await createPost(token, formData);
       dispatch(setUpdatePost({ posts: posts.newPost }));
-      setImage(null);
+      setImages([]);
       setPost("");
       setIsImage(false);
-      handleClick()
-      navigate(0);
+      handleClick();
+      // navigate(0);
     } catch (error) {
       console.error("Error creating post:", error);
       toast.error("An error occurred while creating the post");
     }
+    finally {
+      setIsLoading(false);
+    }
   };
 
   const handleImageDrop = (acceptedFiles) => {
-    const selectedImage = acceptedFiles[0];
-    const isImageValid = selectedImage && selectedImage.type.includes("image");
-
-    if (isImageValid) {
-      setImage(selectedImage);
+    const selectedImages = acceptedFiles.filter((file) =>
+      file.type.includes("image")
+    );
+  
+    const selectedVideos = acceptedFiles.filter((file) =>
+      file.type.includes("video")
+    );
+  
+    if (selectedImages.length > 0 || selectedVideos.length > 0) {
+      const selectedFiles = [...selectedImages, ...selectedVideos];
+      setImages(selectedFiles);
     } else {
-      toast.error("Please select a valid image file (jpg/jpeg/png)");
+      toast.error("Please select valid image or video files (jpg/jpeg/png/mp4)");
     }
   };
   
+
+  const handleDeleteImage = (index) => {
+    const updatedImages = [...images];
+    updatedImages.splice(index, 1);
+    setImages(updatedImages);
+  };
 
   return (
     <WidgetWrapper>
@@ -76,9 +117,6 @@ const MyPostWidget = ({ picturePath,handleClick }) => {
             if (!value.startsWith(" ")) {
               setPost(value);
             }
-            // else{
-            //   setPost()
-            // }
           }}
           value={post}
           sx={{
@@ -91,7 +129,7 @@ const MyPostWidget = ({ picturePath,handleClick }) => {
       </FlexBetween>
       {isImage && (
         <Box border={`1px solid ${palette.neutral.medium}`} borderRadius="5px" mt="1rem" p="1rem">
-          <Dropzone acceptedFiles=".jpg,.jpeg,.png" multiple={false} onDrop={handleImageDrop}>
+          <Dropzone acceptedFiles=".jpg,.jpeg,.png,.mp4" multiple={true} onDrop={handleImageDrop}>
             {({ getRootProps, getInputProps }) => (
               <FlexBetween>
                 <Box
@@ -102,18 +140,21 @@ const MyPostWidget = ({ picturePath,handleClick }) => {
                   sx={{ "&:hover": { cursor: "pointer" } }}
                 >
                   <input {...getInputProps()} />
-                  {!image ? <p>Add Image Here</p> : (
-                    <FlexBetween>
-                      <Typography>{image.name}</Typography>
-                      <EditOutlined />
+                  {images.length === 0 ? (
+                    <p>Add Image(s) Here</p>
+                  ) : (
+                    <FlexBetween flexDirection="column">
+                      {images.map((image, index) => (
+                        <FlexBetween key={index}>
+                          <Typography>{image.name}</Typography>
+                          <IconButton onClick={() => handleDeleteImage(index)} sx={{ width: "15%" }}>
+                            <DeleteOutlined />
+                          </IconButton>
+                        </FlexBetween>
+                      ))}
                     </FlexBetween>
                   )}
                 </Box>
-                {image && (
-                  <IconButton onClick={() => setImage(null)} sx={{ width: "15%" }}>
-                    <DeleteOutlined />
-                  </IconButton>
-                )}
               </FlexBetween>
             )}
           </Dropzone>
@@ -132,12 +173,14 @@ const MyPostWidget = ({ picturePath,handleClick }) => {
 
         {isNonMobileScreens ? (
           <>
-            <FlexBetween gap="0.25rem">
-              <GifBoxOutlined sx={{ color: palette.neutral.mediumMain }} />
-              <Typography color={palette.neutral.mediumMain}>Clip</Typography>
-            </FlexBetween>
+            <FlexBetween gap="0.25rem" onClick={() => setIsImage(!isImage)}>
+          <VideocamOutlined sx={{ color: palette.neutral.mediumMain }} />
+          <Typography color={palette.neutral.mediumMain} sx={{ "&:hover": { cursor: "pointer", color: palette.neutral.medium } }}>
+            Video
+          </Typography>
+        </FlexBetween>
 
-            <FlexBetween gap="0.25rem">
+            {/* <FlexBetween gap="0.25rem">
               <AttachFileOutlined sx={{ color: palette.neutral.mediumMain }} />
               <Typography color={palette.neutral.mediumMain}>Attachment</Typography>
             </FlexBetween>
@@ -145,7 +188,7 @@ const MyPostWidget = ({ picturePath,handleClick }) => {
             <FlexBetween gap="0.25rem">
               <MicOutlined sx={{ color: palette.neutral.mediumMain }} />
               <Typography color={palette.neutral.mediumMain}>Audio</Typography>
-            </FlexBetween>
+            </FlexBetween> */}
           </>
         ) : (
           <FlexBetween gap="0.25rem">
@@ -165,6 +208,18 @@ const MyPostWidget = ({ picturePath,handleClick }) => {
           POST
         </Button>
       </FlexBetween>
+      {isLoading && (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "200px", // Set height as per your requirements
+          }}
+        >
+          <CircularProgress />
+        </Box>
+      )}
 
       <ToastContainer position="center" autoClose={3000} hideProgressBar closeOnClick draggable pauseOnHover />
     </WidgetWrapper>

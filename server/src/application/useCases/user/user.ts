@@ -104,3 +104,16 @@ export const userHandle = async (
   }
   return result;
 };
+export const userReport = async (
+  id: string,
+  userId: string,
+  reason: string,
+  repository: ReturnType<UserDbInterface>
+) => {
+  const reportUser = await repository.reportUser(id,userId,reason);
+
+  if (!reportUser) {
+    throw new AppError("Reported Already", HttpStatus.BAD_REQUEST);
+  }
+  return reportUser;
+};

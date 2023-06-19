@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable react/prop-types */
 import { PersonAddOutlined, PersonRemoveOutlined } from "@mui/icons-material";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
@@ -5,11 +7,23 @@ import { useNavigate } from "react-router-dom";
 import FlexBetween from "../FlexBetween/FlexBetween";
 import UserImage from "../UserImage/UserImage";
 import { followReq, getUser } from "../../api/userApi/userApi";
-import { setFollowers, setFollowing, setFriendFollowers } from "../../state/slice";
+import {
+  setFollowers,
+  setFollowing,
+  setFriendFollowers,
+} from "../../state/slice";
 import { useEffect, useState } from "react";
 
 // eslint-disable-next-line react/prop-types
-const Friend = ({ friendId, name, subtitle, userPicturePath,handleRequest }) => {
+const Friend = ({
+  friendId,
+  name,
+  subtitle,
+  userPicturePath,
+  handleRequest,
+  handleClick,
+  isProfilePost
+}) => {
   const [user, setUser] = useState();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -26,7 +40,8 @@ const Friend = ({ friendId, name, subtitle, userPicturePath,handleRequest }) => 
     const response = await followReq(userId, friendId, token);
     dispatch(setFollowers({ followers: response.followers }));
     dispatch(setFollowing({ following: response.following }));
-    handleRequest()
+    handleClick && handleClick();
+    handleRequest && handleRequest();
   };
   const getuser = async () => {
     const result = await getUser(friendId, token);
@@ -63,8 +78,9 @@ const Friend = ({ friendId, name, subtitle, userPicturePath,handleRequest }) => 
           </Typography>
         </Box>
       </FlexBetween>
-      {userId !== friendId && (
-        <IconButton
+      {userId !== friendId && (<>
+        {!isProfilePost && (
+          <IconButton
           onClick={() => followRequest()}
           sx={{ backgroundColor: primaryLight, p: "0.6rem" }}
         >
@@ -74,6 +90,8 @@ const Friend = ({ friendId, name, subtitle, userPicturePath,handleRequest }) => 
             <PersonAddOutlined sx={{ color: primaryDark }} />
           )}
         </IconButton>
+        )}
+        </>
       )}
     </FlexBetween>
   );

@@ -17,7 +17,7 @@ const postSchema = new Schema(
     comments: [],
     report:[],
 
-    image: String,
+    image: [],
   },
   {
     timestamps: true,

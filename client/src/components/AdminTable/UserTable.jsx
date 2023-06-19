@@ -11,28 +11,31 @@ import { useEffect, useState } from "react";
 import { getAllUsers, userHandle } from "../../api/AdminRequest/AdminRequest";
 import { useSelector } from "react-redux";
 import Pagination from "@mui/material/Pagination";
-import { Button } from "@mui/material";
+import { Button, CircularProgress, Skeleton } from "@mui/material";
 
 const UserTable = () => {
   const token = useSelector((state) => state.adminToken);
   const [users, setUsers] = useState([]);
   const [page, setPage] = useState(1);
-  const [rowsPerPage] = useState(10);
-const handleUser = async(userId) => {
-  const user = await userHandle(userId,token)
-  const updatedUsers = users.map((user) => {
-    if (user._id === userId) {
-      return { ...user, isBlocked: !user.isBlocked };
-    }
-    return user;
-  });
-  setUsers(updatedUsers);
-}
+  const [rowsPerPage] = useState(4);
+  const [loading, setLoading] = useState(true);
+  const handleUser = async (userId) => {
+    const user = await userHandle(userId, token);
+    const updatedUsers = users.map((user) => {
+      if (user._id === userId) {
+        return { ...user, isBlocked: !user.isBlocked };
+      }
+      return user;
+    });
+    setUsers(updatedUsers);
+  };
   useEffect(() => {
     const getUsers = async () => {
       try {
         const response = await getAllUsers(token);
         setUsers(response);
+    setLoading(false);
+
       } catch (error) {
         console.error("Error fetching users:", error);
       }
@@ -55,18 +58,25 @@ const handleUser = async(userId) => {
       <Typography variant='h6' component='div' sx={{ mb: 2 }}>
         User Table
       </Typography>
+      {loading ? ( 
+        <>
+        <Skeleton height={"80vh"} animation="wave"/>
+        </>
+      ) : (
+        <>
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label='user table'>
           <TableHead>
             <TableRow>
-              <TableCell>Name</TableCell>
               <TableCell>Profile Picture</TableCell>
+              <TableCell>Name</TableCell>
               <TableCell>Username</TableCell>
               <TableCell>Email</TableCell>
               <TableCell>Number</TableCell>
               <TableCell>Total Posts</TableCell>
               <TableCell>Total Following</TableCell>
               <TableCell>Total Followers</TableCell>
+              <TableCell>Total Reports</TableCell>
               <TableCell>Action</TableCell>
             </TableRow>
           </TableHead>
@@ -93,13 +103,22 @@ const handleUser = async(userId) => {
                 <TableCell>{user.posts.length}</TableCell>
                 <TableCell>{user.following.length}</TableCell>
                 <TableCell>{user.followers.length}</TableCell>
+                <TableCell>{user.report?.length}</TableCell>
                 <TableCell>
                   {user.isBlocked ? (
-                    <Button variant='outlined' color='primary' onClick={()=>handleUser(user._id)}>
-                      Activate
+                    <Button
+                      variant='outlined'
+                      color='primary'
+                      onClick={() => handleUser(user._id)}
+                    >
+                      Reactivate
                     </Button>
                   ) : (
-                    <Button variant='outlined' color='secondary' onClick={()=>handleUser(user._id)}>
+                    <Button
+                      variant='outlined'
+                      color='secondary'
+                      onClick={() => handleUser(user._id)}
+                    >
                       Deactivate
                     </Button>
                   )}
@@ -115,6 +134,8 @@ const handleUser = async(userId) => {
         onChange={handleChangePage}
         sx={{ mt: 2 }}
       />
+       </>
+      )}
     </div>
   );
 };
