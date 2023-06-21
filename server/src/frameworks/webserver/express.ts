@@ -13,7 +13,7 @@ const expressConfig = (app: Application) => {
   // Development logging
  
   const corsOptions = {
-    origin: 'http://localhost:5173',
+    origin: ['https://sociograam.online', 'https://www.sociograam.online'],
     exposedHeaders: ['Cross-Origin-Opener-Policy', 'Cross-Origin-Resource-Policy'],
   };
   // app.use((req, res, next) => {
