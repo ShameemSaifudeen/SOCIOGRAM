@@ -35,6 +35,12 @@ connectDB();
 
 expressConfig(app)
 
+app.use(express.static(path.join(__dirname, 'frontendBuild')));
+
+app.get('/', function(req, res) {
+  res.sendFile(path.join(__dirname, 'frontendBuild', 'index.html'));
+});
+
 app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
 
 // routes for each endpoint
