@@ -12,6 +12,7 @@ import ChatPage from "./pages/Chat/Chat";
 import AdminLogin from "./pages/AdminLogin/AdminLogin";
 import AdminHome from "./pages/AdminHome/AdminHome";
 import CallPage from "./pages/Call/Call";
+import NotFoundPage from "./pages/404Page/404Page";
 
 function App() {
   const mode = useSelector((state) => state.mode);
@@ -59,6 +60,7 @@ function App() {
               path='/admin/home'
               element={adminToken ? <AdminHome /> : <Navigate to='/admin' />}
             />
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </ThemeProvider>
       </BrowserRouter>

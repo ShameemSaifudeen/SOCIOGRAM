@@ -145,6 +145,20 @@ const handleGoogleLogin = async()=>{
     >
       {/* <ToastContainer position="bottom-left" /> */}
       <Paper className={classes.paper} elevation={6}>
+      <div style={{ textAlign: "center", marginBottom: "16px" }}>
+          <Typography
+            variant="h4"
+            component="h1"
+            style={{
+              fontWeight: "bold",
+              color: "#00D5FA",
+              textTransform: "uppercase",
+            }}
+          >
+            SOCIOGRAM
+          </Typography>
+        </div>
+
         <Avatar className={classes.avatar}></Avatar>
         <Typography component='h1' variant='h5'>
           {isSignup ? "Sign up" : "Sign in"}

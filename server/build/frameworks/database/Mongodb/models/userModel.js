@@ -41,21 +41,25 @@ const userSchema = new mongoose_1.Schema({
     },
     number: {
         type: Number,
-        required: true,
         // unique: true,
     },
     password: {
         type: String,
-        required: true,
-        minlength: 3
     },
-    dp: {
+    displayPicture: {
         type: String,
     },
     bio: {
         type: String,
     },
+    location: {
+        type: String,
+    },
     isAdmin: {
+        type: Boolean,
+        default: false,
+    },
+    isBlocked: {
         type: Boolean,
         default: false,
     },
@@ -71,6 +75,7 @@ const userSchema = new mongoose_1.Schema({
             ref: "User",
         },
     ],
+    report: []
 }, { timestamps: true });
 const User = (0, mongoose_1.model)("User", userSchema);
 exports.default = User;

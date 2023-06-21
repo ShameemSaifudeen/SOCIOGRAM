@@ -65,8 +65,6 @@ const ChatBox = ({ chat, currentUser, setSendMessage, receivedMessage }) => {
   const handleSend = async (e) => {
     e.preventDefault();
 
-    console.log(newMessage);
-    console.log(e.message, "><><>");
     // if (!newMessage.trim()) {
     //   return;
     // }

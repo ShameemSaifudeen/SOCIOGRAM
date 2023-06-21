@@ -10,13 +10,13 @@ const postSchema = new mongoose_1.Schema({
         type: String,
         required: true,
     },
+    userName: {
+        type: String,
+    },
     likes: [],
     comments: [],
-    createdAt: {
-        type: Date,
-        default: new Date(),
-    },
-    image: String,
+    report: [],
+    image: [],
 }, {
     timestamps: true,
 });

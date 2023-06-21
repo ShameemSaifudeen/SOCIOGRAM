@@ -37,7 +37,7 @@ const useStyles = makeStyles((theme) => ({
     cursor: "pointer",
     "&:hover": {
       transform: "scale(1.05)",
-      backgroundColor: "#00D5FA",
+      backgroundColor: "#00353F",
     },
   },
   title: {

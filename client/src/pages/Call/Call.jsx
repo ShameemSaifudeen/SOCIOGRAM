@@ -2,13 +2,14 @@ import { useParams } from "react-router-dom";
 import { ZegoUIKitPrebuilt } from "@zegocloud/zego-uikit-prebuilt";
 import Navbar from "../NavBar/NavBar"
 import { Box } from "@mui/material";
+import configKeys from "../../config";
 
 const CallPage = () => {
   const { roomId } = useParams();
 
   const myMeeting = async (element) => {
-    const appID = 36793106;
-    const serverSecret = "42d9712ed63d054114625f34dfc55404";
+    const appID = Number(configKeys.appID);
+    const serverSecret = configKeys.serverSecret;
     const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
       appID,
       serverSecret,

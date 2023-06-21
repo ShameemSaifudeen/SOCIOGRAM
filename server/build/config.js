@@ -8,6 +8,7 @@ dotenv_1.default.config();
 const configKeys = {
     MONGO_DB_URL: process.env.MONGODB_URL,
     PORT: process.env.PORT,
+    ORIGIN_PORT: process.env.ORIGIN_PORT,
     JWT_SECRET: process.env.JWT_KEY
 };
 exports.default = configKeys;
