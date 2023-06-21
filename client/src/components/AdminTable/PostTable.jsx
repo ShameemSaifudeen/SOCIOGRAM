@@ -115,14 +115,14 @@ const PostTable = () => {
                             style={{ objectFit: "cover", marginRight: "1rem" }}
                             width={"55px"}
                             height={"55px"}
-                            src={`http://localhost:5000/uploads/${post.image[0]}`}
+                            src={`https://api.sociograam.online/uploads/${post.image[0]}`}
                             alt=""
                           />
                           <img
                             style={{ objectFit: "cover" }}
                             width={"55px"}
                             height={"55px"}
-                            src={`http://localhost:5000/uploads/${post.image[1]}`}
+                            src={`https://api.sociograam.online/uploads/${post.image[1]}`}
                             alt=""
                           />
                         </>
@@ -131,7 +131,7 @@ const PostTable = () => {
                           style={{ objectFit: "cover" }}
                           width={"55px"}
                           height={"55px"}
-                          src={`http://localhost:5000/uploads/${post.image[0]}`}
+                          src={`https://api.sociograam.online/uploads/${post.image[0]}`}
                           alt=""
                         />
                       )}

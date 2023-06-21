@@ -34,9 +34,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistStore(store)}>
-        {/* <ErrorBoundary> */}
+        <ErrorBoundary>
           <App />
-        {/* </ErrorBoundary> */}
+        </ErrorBoundary>
       </PersistGate>
     </Provider>
   </React.StrictMode>

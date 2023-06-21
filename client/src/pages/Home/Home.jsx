@@ -20,7 +20,7 @@ useEffect(()=>{
 
 },[click])
 
-const socket = io("ws://localhost:5000")
+const socket = io("ws://api.sociograam.online")
 useEffect(()=>{
  socket?.emit("new-user-add",user._id)
 

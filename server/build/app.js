@@ -21,7 +21,7 @@ const server = http_1.default.createServer(app);
 // app.use(cors())
 const io = new socket_io_1.Server(server, {
     cors: {
-        origin: "http://localhost:5173",
+        origin: ['https://sociograam.online', 'https://www.sociograam.online'],
         methods: ["GET", "POST"]
     }
 });

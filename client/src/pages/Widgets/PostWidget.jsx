@@ -206,7 +206,7 @@ const isProfilePost = useState(true)
               <React.Fragment key={index}>
                 {isVideo(imageName) ? (
                   <video
-                    src={`http://localhost:5000/uploads/${imageName}`}
+                    src={`https://api.sociograam.online/uploads/${imageName}`}
                     controls
                     style={{
                       width: "100%",
@@ -217,7 +217,7 @@ const isProfilePost = useState(true)
                   />
                 ) : (
                   <img
-                    src={`http://localhost:5000/uploads/${imageName}`}
+                    src={`https://api.sociograam.online/uploads/${imageName}`}
                     alt={`post-image-${index}`}
                     style={{
                       width: "100%",
@@ -246,7 +246,7 @@ const isProfilePost = useState(true)
               }}
             >
               <source
-                src={`http://localhost:5000/uploads/${image[0]}`}
+                src={`https://api.sociograam.online/uploads/${image[0]}`}
                 type='video/mp4'
               />
               Your browser does not support the video tag.
@@ -260,7 +260,7 @@ const isProfilePost = useState(true)
                 borderRadius: "0.75rem",
                 marginTop: "0.75rem",
               }}
-              src={`http://localhost:5000/uploads/${image[0]}`}
+              src={`https://api.sociograam.online/uploads/${image[0]}`}
             />
           )}
         </>

@@ -34,7 +34,7 @@ const ProfilePage = () => {
   useEffect(() => {
     getuser();
   }, [click, userId]); // eslint-disable-line react-hooks/exhaustive-deps
-  const socket = io("ws://localhost:5000");
+  const socket = io("ws://api.sociograam.online");
   useEffect(() => {
     socket?.emit("new-user-add", _id);
   }, [socket, loggedUser]);

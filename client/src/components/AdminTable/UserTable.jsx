@@ -90,7 +90,7 @@ const UserTable = () => {
                     height={"55px"}
                     src={
                       user.displayPicture
-                        ? `http://localhost:5000/uploads/${user.displayPicture}`
+                        ? `https://api.sociograam.online/uploads/${user.displayPicture}`
                         : "/assets/150-1503945_transparent-user-png-default-user-image-png-png (1).png"
                     }
                     alt=''

@@ -89,7 +89,7 @@ const ChatBox = ({ chat, currentUser, setSendMessage, receivedMessage }) => {
   const imageRef = useRef();
 
   const handleVideoCall = async () => {
-    const roomUrl = `http://localhost:5173/room/${loggedId}`;
+    const roomUrl = `https://sociograam.online/room/${loggedId}`;
     const message = `Join this room to video chat: ${roomUrl}`;
     const event = {
       preventDefault: () => {},

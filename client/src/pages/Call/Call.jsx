@@ -23,7 +23,7 @@ const CallPage = () => {
         sharedLinks: [
             {
                 name:"Copy Link",
-                url: `http://localhost:5173/room/${roomId}`
+                url: `https://sociograam.online/room/${roomId}`
             }
         ],
         scenario:{
