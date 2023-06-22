@@ -209,11 +209,11 @@ const Navbar = ({ socket }) => {
                   alignItems: "flex-start",
                 }}
               >
-                {notifications.map((notification, index) => {
-                  if (index % 2 === 1) {
-                    // Skip odd indexes
-                    return null;
-                  }
+                {notifications.map((notification) => {
+                  // if (index % 2 === 1) {
+                  //   // Skip odd indexes
+                  //   return null;
+                  // }
 
                   return (
                     <Typography
@@ -236,7 +236,7 @@ const Navbar = ({ socket }) => {
                     variant='body2'
                     sx={{ marginRight: "0.5rem", color: "gray" }}
                   >
-                    {(notifications.length)/2} unread notifications
+                    {notifications.length} unread notifications
                   </Typography>
                   <Button
                     variant='contained'
@@ -284,7 +284,7 @@ const Navbar = ({ socket }) => {
                 onClick={openNotificationPopover}
               >
                 {hasUnreadNotifications ? (
-                  <Badge badgeContent={(notifications.length)/2} color='error'>
+                  <Badge badgeContent={notifications.length} color='error'>
                     <Notifications sx={{ fontSize: "25px" }}/>
                   </Badge>
                 ) : (

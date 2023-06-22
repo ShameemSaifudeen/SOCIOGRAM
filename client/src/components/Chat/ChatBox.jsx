@@ -138,7 +138,7 @@ const ChatBox = ({ chat, currentUser, setSendMessage, receivedMessage }) => {
                 >
                   {message.message.startsWith("Join this room to video") ? (
                     <>
-                      <Link to={message.message.match(/http:\/\/\S+/)[0]}>
+                      <Link to={message.message.match(/https:\/\/\S+/)[0]}>
                         <span>{message.message}</span>
                       </Link>
                       <span>{format(message.createdAt)}</span>
