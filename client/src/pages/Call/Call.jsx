@@ -13,7 +13,7 @@ const CallPage = () => {
     const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
       appID,
       serverSecret,
-      `"${roomId}"`,
+      roomId,
       Date.now().toString(),
       "Enter NickName"
     );
