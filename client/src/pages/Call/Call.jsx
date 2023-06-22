@@ -8,12 +8,12 @@ const CallPage = () => {
   const { roomId } = useParams();
 
   const myMeeting = async (element) => {
-    const appID = Number(configKeys.appID);
-    const serverSecret = configKeys.serverSecret;
+    const appID = 36793106;
+    const serverSecret = "42d9712ed63d054114625f34dfc55404";
     const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
       appID,
       serverSecret,
-      roomId,
+      `"${roomId}"`,
       Date.now().toString(),
       "Enter NickName"
     );
