@@ -20,7 +20,7 @@ useEffect(()=>{
 
 },[click])
 
-const socket = io("ws://api.sociograam.online")
+const socket = io("https://api.sociograam.online")
 useEffect(()=>{
  socket?.emit("new-user-add",user._id)
 
