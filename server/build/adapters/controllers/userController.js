@@ -23,7 +23,7 @@ const userController = (userDbRepository, userDbRepositoryImpl) => {
         });
     });
     const updateProfile = (0, express_async_handler_1.default)(async (req, res) => {
-        const displayPicture = req?.file?.filename;
+        const displayPicture = req?.file?.path;
         const { name, userName, email, number, bio, location } = req.body;
         const { id } = req.params;
         const user = {

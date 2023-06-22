@@ -9,7 +9,7 @@ const UserImage = ({image,  size = "60px" }) => {
         width={size}
         height={size}
         alt="user"
-        src={image ? `https://api.sociograam.online/uploads/${image}` : "/assets/150-1503945_transparent-user-png-default-user-image-png-png (1).png"}
+        src={image ? `${image}` : "/assets/150-1503945_transparent-user-png-default-user-image-png-png (1).png"}
        
       />
     </Box>

@@ -21,7 +21,7 @@ const postController = (
     const { userId, description, userName } = req.body;
   const files: any = req?.files
     for (const file of files) {
-      const picture = file.filename;
+      const picture = file.path;
       image.push(picture);
     }
     

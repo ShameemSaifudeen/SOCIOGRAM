@@ -1,17 +1,37 @@
-import multer,{StorageEngine} from 'multer'
-import path from 'path';
+import multer from 'multer';
+import cloudinary from 'cloudinary';
+import { v2 as cloudinaryV2 } from 'cloudinary';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import { v4 as uuidv4 } from 'uuid';
-const storage : StorageEngine = multer.diskStorage({
-    destination: (req, file, cb) => {
-        
+import configKeys from '../../config'
 
-        cb(null, 'public/uploads')
+// Configure Cloudinary
+cloudinaryV2.config({ 
+    cloud_name: configKeys.CLOUD_NAME, 
+    api_key: configKeys.API_KEY, 
+    api_secret: configKeys.API_SECRET 
+  });
+
+// Configure multer storage using Cloudinary
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinaryV2,
+  params: {
+    folder: (req: any, file: any) => 'uploads', // Specify the folder in Cloudinary where you want to store the files
+    resource_type: (req: any, file: any) => {
+      // Determine the resource type based on the file mimetype
+      if (file.mimetype.startsWith('video/')) {
+        return 'video';
+      }
+      return 'auto';
     },
-    filename: (req, file, cb) => {
-        const uniqueFilename = `${uuidv4()}-${file.originalname}`;
-    cb(null, uniqueFilename);
+    public_id: (req: Express.Request, file: Express.Multer.File) => {
+      const fileName = `${uuidv4()}-${file.originalname}`;
+      return fileName;
     }
+  } as any
 });
 
-export const upload= multer({storage})
+// Create multer instance with Cloudinary storage
+const upload = multer({ storage });
 
+export { upload };

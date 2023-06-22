@@ -38,7 +38,7 @@ const userController = (
     });
   });
   const updateProfile = asyncHandler(async (req: Request, res: Response) => {
-    const displayPicture: any = req?.file?.filename;
+    const displayPicture: any = req?.file?.path;
     const { name, userName, email, number, bio, location } = req.body;
     const { id } = req.params;
     const user = {
