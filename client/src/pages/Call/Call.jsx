@@ -8,8 +8,8 @@ const CallPage = () => {
   const { roomId } = useParams();
 
   const myMeeting = async (element) => {
-    const appID = 36793106;
-    const serverSecret = "42d9712ed63d054114625f34dfc55404";
+    const appID = parseInt(configKeys.appID);
+    const serverSecret = configKeys.serverSecret;
     const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
       appID,
       serverSecret,
@@ -17,9 +17,7 @@ const CallPage = () => {
       Date.now().toString(),
       "Enter NickName"
     );
-   console.log(kitToken,":::::::");
-    const zc = ZegoUIKitPrebuilt.create(kitToken)
-    console.log(zc,"::::::::")
+    const zc = ZegoUIKitPrebuilt.create(kitToken.toString())
     zc.joinRoom({
         container: element,
         sharedLinks: [
