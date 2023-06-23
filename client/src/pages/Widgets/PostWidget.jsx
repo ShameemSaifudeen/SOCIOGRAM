@@ -143,7 +143,7 @@ const isProfilePost = useState(true)
   };
 
   const isVideo = (fileName) => {
-    const videoExtensions = [".mp4", ".mov", ".avi", ".mkv"]; // Add more video extensions if needed
+    const videoExtensions = [".mp4", ".mov", ".avi", ".mkv"]; 
     const extension = fileName
       .substring(fileName.lastIndexOf("."))
       .toLowerCase();
@@ -511,7 +511,7 @@ const isProfilePost = useState(true)
         </DialogContent>
         <DialogActions>
           <Button onClick={handleReportCancel}>Cancel</Button>
-          <Button onClick={handleReportConfirm} color='error'>
+          <Button onClick={handleReportConfirm} color='error' disabled={reportReason.trim() === ""}>
             Report
           </Button>
         </DialogActions>

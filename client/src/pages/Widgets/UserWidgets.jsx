@@ -292,6 +292,7 @@ const UserWidget = ({ userId, userData, isProfile = false, handleEffect }) => {
             }}
             variant='contained'
             color='primary'
+            disabled={reportReason.trim() === ""}
           >
             Submit
           </Button>
