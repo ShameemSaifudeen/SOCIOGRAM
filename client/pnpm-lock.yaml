@@ -23,8 +23,8 @@ dependencies:
     specifier: ^1.9.5
     version: 1.9.5(react-redux@8.0.5)(react@18.2.0)
   '@zegocloud/zego-uikit-prebuilt':
-    specifier: ^1.8.4
-    version: 1.8.4
+    specifier: ^1.8.5
+    version: 1.8.5
   axios:
     specifier: ^1.4.0
     version: 1.4.0
@@ -1658,8 +1658,8 @@ packages:
       - supports-color
     dev: true
 
-  /@zegocloud/zego-uikit-prebuilt@1.8.4:
-    resolution: {integrity: sha512-VumWA2/xv8LCvjkFvGYUWZkHHryIJ6CzfP2yauPVFlEljwMJa1GNEmzsKhpMtODodYCiVDiykgOKKJg03FNrEg==}
+  /@zegocloud/zego-uikit-prebuilt@1.8.5:
+    resolution: {integrity: sha512-TXRItkf60tGZP2+o2hf+d619OqDaPpjt/Xv66M9WPagCGFiWDT1gzjfE0bLq5wcXk4Fe9sJZ6tdYiXO89bduOg==}
     dev: false
 
   /acorn-jsx@5.3.2(acorn@8.8.2):
