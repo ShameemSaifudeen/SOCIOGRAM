@@ -13,7 +13,7 @@ import {
 import UserImage from "../UserImage/UserImage";
 import { Box, Typography } from "@mui/material";
 import { VideoCall } from "@mui/icons-material";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const ChatBox = ({ chat, currentUser, setSendMessage, receivedMessage }) => {
   const navigate = useNavigate();
@@ -86,7 +86,7 @@ const ChatBox = ({ chat, currentUser, setSendMessage, receivedMessage }) => {
   };
 
   const scroll = useRef();
-  const imageRef = useRef();
+  // const imageRef = useRef();
 
   const handleVideoCall = async () => {
     const roomUrl = `https://sociograam.online/room/${loggedId}`;
