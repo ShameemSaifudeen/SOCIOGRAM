@@ -139,9 +139,18 @@ const ChatBox = ({ chat, currentUser, setSendMessage, receivedMessage }) => {
                   {message.message.startsWith("Join this room to video") ? (
                     <>
                       {message.message.match(/https?:\/\/\S+/) ? (
-                        <Link to={message.message.match(/https?:\/\/\S+/)[0]}>
-                          <span>{message.message}</span>
-                        </Link>
+                        <span
+                          onClick={() =>
+                            navigate(
+                              `/room/${
+                                message.message.match(/\/room\/(\w+)/)[1]
+                              }`
+                            )
+                          }
+                          style={{ cursor: "pointer" }}
+                        >
+                          {message.message}
+                        </span>
                       ) : (
                         <span>{message.message}</span>
                       )}

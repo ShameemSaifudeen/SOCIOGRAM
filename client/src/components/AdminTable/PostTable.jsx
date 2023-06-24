@@ -29,11 +29,10 @@ const PostTable = () => {
   const [render, setRender] = useState(false);
   const [page, setPage] = useState(1);
   const [rowsPerPage] = useState(10);
-  const [filterReported, setFilterReported] = useState(false); // New state variable
+  const [filterReported, setFilterReported] = useState(false); 
 
   const handleDelete = async (postId) => {
     setSelectedPostId(postId);
-    // setFilterReported(false); // Reset filter status
     setDeleteDialogOpen(true);
   };
 
@@ -63,7 +62,7 @@ const PostTable = () => {
   }, [render]);
 
   const displayPosts = filterReported
-    ? posts.filter((post) => post.report.length > 0)
+    ? posts.filter((post) => post.report.length > 0).sort((a, b) => b.report.length - a.report.length)
     : posts.slice(
         (page - 1) * rowsPerPage,
         (page - 1) * rowsPerPage + rowsPerPage
