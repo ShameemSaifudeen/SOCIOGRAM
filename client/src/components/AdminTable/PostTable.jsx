@@ -30,6 +30,7 @@ const PostTable = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage] = useState(10);
   const [filterReported, setFilterReported] = useState(false); 
+  console.log("hhhhhhhhhhhhhhh");
 
   const handleDelete = async (postId) => {
     setSelectedPostId(postId);
